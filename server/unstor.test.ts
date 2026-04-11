@@ -153,7 +153,7 @@ describe("Unstor identity", () => {
   it("UNSTOR_SYSTEM_PROMPT contains Unstor identity", async () => {
     const { UNSTOR_SYSTEM_PROMPT } = await import("./kimi");
     expect(UNSTOR_SYSTEM_PROMPT).toContain("Unstor");
-    expect(UNSTOR_SYSTEM_PROMPT).toContain("guidance intelligence");
+    expect(UNSTOR_SYSTEM_PROMPT).toContain("structured AI wisdom system");
     expect(UNSTOR_SYSTEM_PROMPT).toContain("ALTERNATIVE MEDICINE RULE");
     expect(UNSTOR_SYSTEM_PROMPT).toContain("SAFETY ESCALATION RULE");
     expect(UNSTOR_SYSTEM_PROMPT).toContain("proprietary intelligence architecture");
@@ -203,8 +203,8 @@ describe("Unstor identity", () => {
   it("UNSTOR_SYSTEM_PROMPT contains quantum Ifá knowledge rule", async () => {
     const { UNSTOR_SYSTEM_PROMPT } = await import("./kimi");
     expect(UNSTOR_SYSTEM_PROMPT).toContain("IFÁ AND QUANTUM REALITY");
-    expect(UNSTOR_SYSTEM_PROMPT).toContain("quantum probability field");
-    expect(UNSTOR_SYSTEM_PROMPT).toContain("wave function");
+    expect(UNSTOR_SYSTEM_PROMPT).toContain("symbolic probability field");
+    expect(UNSTOR_SYSTEM_PROMPT).toContain("moment of inquiry");
   });
 
   it("UNSTOR_SYSTEM_PROMPT contains layered Odù decoding rule", async () => {
@@ -229,7 +229,7 @@ describe("Unstor identity", () => {
     expect(UNSTOR_SYSTEM_PROMPT).toContain("Physical");
     expect(UNSTOR_SYSTEM_PROMPT).toContain("Mental / Emotional");
     expect(UNSTOR_SYSTEM_PROMPT).toContain("Relational");
-    expect(UNSTOR_SYSTEM_PROMPT).toContain("Energetic / Quantum");
+    expect(UNSTOR_SYSTEM_PROMPT).toContain("Energetic");
   });
 
   it("UNSTOR_SYSTEM_PROMPT response structure includes layered insight and holistic action", async () => {

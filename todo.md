@@ -308,3 +308,19 @@
 - [x] Upgrade Kimi model from moonshot-v1-8k to moonshot-v1-32k for larger context window
 - [ ] Expand prompt_templates to 50,000+ (run generator with all 50 categories) — deferred
 - [x] Add TTS voice output (Web Speech Synthesis API) to Chat page — Volume2/VolumeX speaker button on every Unstor response, stop/start toggle
+
+## Homepage Rebuild — High-Conversion Version (OKComputer Spec)
+
+- [x] Hero section: new headline "AI-Guided Wisdom for Clarity, Alignment, and Direction", subheadline, key clarity line, 2 CTAs
+- [x] "What Unstor Is — And What It Is Not" section (4 IS bullets, 4 IS NOT bullets)
+- [x] "How Unstor Guides You" 4-step process section
+- [x] "Built on Structured Knowledge Systems" 4 pillars section (Ifá, Behavioural, Traditional Wellness, Research)
+- [x] "Safety, Boundaries, and Responsibility" trust section
+- [x] Replace weak metrics (0% learning, 0 clusters) with honest system transparency: 4 active domains, continuous learning model, early-stage maturity
+- [x] "What You Can Use Unstor For" use cases section (5 practical bullets)
+- [x] Smarter chat entry prompts (4 specific session starters replacing "Ask anything")
+- [x] "Your Data and Privacy" section (3 bullets)
+- [x] Remove overclaims: reword "Daily ingestion from arXiv & PubMed" and "256 Odù fully decoded"
+- [x] Reduce quantum/everything language — keep depth, remove exaggeration
+- [x] Reposition away from medical framing — reflection + support + knowledge only
+- [x] Update Chat page welcome/suggestion prompts to match new session starters

@@ -220,19 +220,19 @@ export default function Chat() {
             <div className="text-center py-16 space-y-4">
               <img src={UNSTOR_AVATAR} alt="Unstor" className="w-16 h-16 rounded-2xl object-cover mx-auto" />
               <div>
-                <h2 className="text-xl font-display font-semibold text-foreground">Unstor is listening</h2>
+                <h2 className="text-xl font-display font-semibold text-foreground">Start a Guided Session</h2>
                 <p className="text-muted-foreground text-sm mt-1 max-w-sm mx-auto">
-                  Every message you send becomes part of Unstor's growing knowledge. Ask anything.
+                  Describe your situation, concern, or question. Unstor will help you understand patterns and find direction.
                 </p>
               </div>
               <div className="flex flex-wrap gap-2 justify-center pt-2">
                 {(dynamicSuggestions && dynamicSuggestions.length > 0
                   ? dynamicSuggestions.map((s) => s.promptText)
                   : [
-                      "What are you learning?",
-                      "Tell me about yourself",
-                      "How does your learning work?",
-                      "What can you help me with?",
+                      "Help me understand a situation I'm dealing with",
+                      "Show me patterns in my behaviour",
+                      "Give me a symbolic interpretation (not divination)",
+                      "Combine traditional and modern perspective on this issue",
                     ]
                 ).map((suggestion) => (
                   <button
