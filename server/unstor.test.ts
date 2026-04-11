@@ -152,17 +152,45 @@ describe("learning pipeline utilities", () => {
 describe("Unstor identity", () => {
   it("UNSTOR_SYSTEM_PROMPT contains Unstor identity", async () => {
     const { UNSTOR_SYSTEM_PROMPT } = await import("./kimi");
-    // Must assert Unstor's own identity
     expect(UNSTOR_SYSTEM_PROMPT).toContain("Unstor");
-    expect(UNSTOR_SYSTEM_PROMPT).toContain("independent");
-    // Must contain the rule to never identify as a third-party AI
-    expect(UNSTOR_SYSTEM_PROMPT).toContain("Never mention");
-    // Must instruct Unstor to use its own identity when asked about its model
+    expect(UNSTOR_SYSTEM_PROMPT).toContain("guidance intelligence");
+    expect(UNSTOR_SYSTEM_PROMPT).toContain("ALTERNATIVE MEDICINE RULE");
+    expect(UNSTOR_SYSTEM_PROMPT).toContain("SAFETY ESCALATION RULE");
     expect(UNSTOR_SYSTEM_PROMPT).toContain("proprietary intelligence architecture");
   });
 
   it("UNSTOR_SYSTEM_PROMPT instructs to never reveal third-party AI brands", async () => {
     const { UNSTOR_SYSTEM_PROMPT } = await import("./kimi");
     expect(UNSTOR_SYSTEM_PROMPT).toContain("Never mention");
+  });
+
+  it("UNSTOR_SYSTEM_PROMPT contains Odu rule: no opele casting", async () => {
+    const { UNSTOR_SYSTEM_PROMPT } = await import("./kimi");
+    expect(UNSTOR_SYSTEM_PROMPT).toContain("opele");
+    expect(UNSTOR_SYSTEM_PROMPT).toContain("symbolic Odù");
+  });
+
+  it("UNSTOR_SYSTEM_PROMPT contains 4-part response structure", async () => {
+    const { UNSTOR_SYSTEM_PROMPT } = await import("./kimi");
+    expect(UNSTOR_SYSTEM_PROMPT).toContain("RESPONSE STRUCTURE");
+    expect(UNSTOR_SYSTEM_PROMPT).toContain("Message");
+    expect(UNSTOR_SYSTEM_PROMPT).toContain("Insight");
+    expect(UNSTOR_SYSTEM_PROMPT).toContain("Action");
+  });
+
+  it("UNSTOR_SYSTEM_PROMPT contains clinical authority rule", async () => {
+    const { UNSTOR_SYSTEM_PROMPT } = await import("./kimi");
+    expect(UNSTOR_SYSTEM_PROMPT).toContain("Clinical medicine = authority");
+    expect(UNSTOR_SYSTEM_PROMPT).toContain("NEVER override");
+  });
+
+  it("UNSTOR_SYSTEM_PROMPT contains limitation rule", async () => {
+    const { UNSTOR_SYSTEM_PROMPT } = await import("./kimi");
+    expect(UNSTOR_SYSTEM_PROMPT).toContain("Return and tell me what you observe");
+  });
+
+  it("UNSTOR_SYSTEM_PROMPT contains closing phrase", async () => {
+    const { UNSTOR_SYSTEM_PROMPT } = await import("./kimi");
+    expect(UNSTOR_SYSTEM_PROMPT).toContain("Ask me anything else. I am here.");
   });
 });

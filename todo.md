@@ -135,3 +135,28 @@
 - [x] 28 tests passing (13 original + 15 new expansion tests)
 - [x] TypeScript compiles cleanly (0 errors)
 - [x] Checkpoint saved
+
+## Unstor Master Prompt — Full System Update
+
+### Core System Prompt
+- [x] Rewrite UNSTOR_SYSTEM_PROMPT with full master prompt: role, position, integration rules, Odù rule, response structure, action types, safety escalation, voice, limitation rule
+- [x] Add alternative medicine rule: herbs presented as supportive only, no dosage/prescription language, always include practitioner disclaimer
+- [x] Add clinical authority rule: clinical medicine = authority, traditional = supportive, Unstor = interpretive guidance
+- [x] Add safety escalation rule: if worsening symptoms/danger signs, must direct to practitioner
+- [x] Add AI + science integration rule: neuroscience/physics/biology as analogy only, not proof
+- [x] Add governance alignment: consent-based, practitioner-led, safety-first
+- [x] Add Odù rule: no opele casting, symbolic Odù only, standard disclaimer phrase
+- [x] Add limitation rule: never claim to monitor or follow up, use "Return and tell me what you observe"
+- [x] Add closing phrase: "Ask me anything else. I am here."
+
+### Ifá Engine Response Structure
+- [x] Enforce 4-part response structure: 1) Odù/principle 2) Message 3) Insight 4) Action
+- [x] Action types: Behavioural (routines, discipline), Lifestyle (sleep, diet, movement), Reflective (awareness, mindset) — NOT treatment plans or prescriptions
+- [x] Clarity rule: no vague answers, no generic spirituality, always tied to user situation
+
+### Frontend Chat UI
+- [x] Update chat placeholder/welcome text to reflect Unstor's new unified health intelligence role
+- [x] Ensure response rendering shows the 4-part structure clearly (Odù, Message, Insight, Action)
+
+### Tests
+- [x] Update/add tests for new system prompt rules (alternative medicine disclaimer, safety escalation, Odù rule) — 33 tests passing

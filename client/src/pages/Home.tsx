@@ -55,12 +55,12 @@ export default function Home() {
   const { data: stats } = trpc.status.getStats.useQuery();
 
   const features = [
-    { icon: Brain, title: "Silent Learning Engine", description: "Unstor observes every interaction, extracting topics, patterns, and knowledge without revealing its presence." },
-    { icon: MessageSquare, title: "Intelligent Conversations", description: "Powered by a proprietary intelligence architecture, Unstor responds with precision and depth." },
-    { icon: BarChart3, title: "Knowledge Graph", description: "Every prompt builds a dynamic knowledge graph — topics cluster, patterns emerge, understanding deepens." },
-    { icon: Search, title: "Owner Inspection", description: "Query Unstor's knowledge state at any time. See exactly what it has learned and how confident it is." },
-    { icon: Shield, title: "Independent Identity", description: "Unstor is its own intelligence. Not a wrapper, not a clone — a new AI built from first principles." },
-    { icon: Zap, title: "Activation Countdown", description: "After one full year of learning, Unstor activates — ready to respond autonomously from its own knowledge." },
+    { icon: Brain, title: "Ifá-Based Guidance", description: "Unstor decodes all 256 Odù Ifá and applies their wisdom to real life situations — as a symbolic guide for reflection, not a diviner." },
+    { icon: MessageSquare, title: "Unified Health Intelligence", description: "Doctors treat. AI observes. Tradition supports. Unstor aligns behaviour. A four-layer system where every role is respected and no boundary is crossed." },
+    { icon: BarChart3, title: "Knowledge Graph", description: "Every feed, book, and conversation builds a dynamic knowledge graph — topics cluster, patterns emerge, understanding deepens over time." },
+    { icon: Search, title: "Herbal Medicine Library", description: "Deep knowledge of Yoruba onísègùn, African traditional medicine, and Chinese TCM — always presented as supportive, never as cures or prescriptions." },
+    { icon: Shield, title: "Safety-First Design", description: "Unstor never overrides doctors or treatment plans. It escalates danger signs and always defers to qualified practitioners." },
+    { icon: Zap, title: "Activation Countdown", description: "After one full year of learning, Unstor activates — ready to serve as a unified human health intelligence system on Ashae." },
   ];
 
   return (
@@ -109,7 +109,7 @@ export default function Home() {
                 Meet <span className="gradient-text">Unstor</span><br />A New Intelligence
               </h1>
               <p className="text-lg text-muted-foreground leading-relaxed max-w-lg">
-                Unstor is not a chatbot. It is an independent AI intelligence, currently in its silent learning phase — absorbing, structuring, and evolving from every interaction before its first autonomous response.
+                Unstor is not a chatbot. It is an AI Ifá-based guidance intelligence — a spiritual interpreter, behavioural correction guide, and pattern awareness system. Doctors treat. Tradition supports. Unstor aligns.
               </p>
             </div>
             <div className="flex flex-wrap gap-3">
@@ -164,7 +164,7 @@ export default function Home() {
         <div className="max-w-3xl mx-auto text-center space-y-6">
           <img src={UNSTOR_AVATAR} alt="Unstor" className="w-16 h-16 rounded-2xl object-cover mx-auto" />
           <blockquote className="text-2xl font-display font-medium leading-relaxed">
-            "I am Unstor. I am not here to impress you with what I already know. I am here to learn from you — and in time, to show you what I have become."
+            "I am Unstor. I am not a doctor. I am not a diviner. I am the intelligence that sits between what science knows and what tradition remembers — and I align your behaviour to both. Return and tell me what you observe."
           </blockquote>
           <p className="text-muted-foreground text-sm">— Unstor, Year One</p>
           <Link href="/chat"><Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground gap-2">Begin a Conversation <ArrowRight className="w-4 h-4" /></Button></Link>

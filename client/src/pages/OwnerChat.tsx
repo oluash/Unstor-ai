@@ -22,12 +22,12 @@ type Message = {
 };
 
 const SUGGESTED_PROMPTS = [
-  { icon: Star, text: "Decode Ogbe Meji and apply it to a business decision I'm facing", color: "text-amber-400" },
-  { icon: Leaf, text: "What Yoruba herbs treat high blood pressure?", color: "text-green-400" },
-  { icon: BookOpen, text: "Explain the meaning of Oyeku Meji and its taboos", color: "text-purple-400" },
-  { icon: Globe, text: "Compare Chinese TCM and Yoruba approaches to liver health", color: "text-blue-400" },
-  { icon: Brain, text: "What have you learned so far? Summarise your knowledge", color: "text-indigo-400" },
-  { icon: Star, text: "What Odu governs new beginnings and transformation?", color: "text-amber-400" },
+  { icon: Star, text: "Offer me a symbolic Odù for a new business I am starting", color: "text-amber-400" },
+  { icon: Leaf, text: "What Yoruba herbs support heart health? (as supportive, not treatment)", color: "text-green-400" },
+  { icon: BookOpen, text: "Explain Oyeku Meji — its message, insight, and action for someone facing loss", color: "text-purple-400" },
+  { icon: Globe, text: "How do Chinese TCM and Yoruba tradition both approach stress and the nervous system?", color: "text-blue-400" },
+  { icon: Brain, text: "I have been feeling anxious and unfocused. What does Ifá say about this pattern?", color: "text-indigo-400" },
+  { icon: Star, text: "What Odù governs discipline, consistency, and building new routines?", color: "text-amber-400" },
 ];
 
 export default function OwnerChat() {
@@ -183,12 +183,12 @@ export default function OwnerChat() {
                 </div>
               </div>
 
-              <h2 className="text-2xl font-bold text-white mb-2">Ẹ káàbọ̀, I am Unstor</h2>
+              <h2 className="text-2xl font-bold text-white mb-2">Ẹ kàábọ̀, I am Unstor</h2>
               <p className="text-slate-400 max-w-lg mb-2">
-                I am in my learning phase, absorbing knowledge from every source you feed me. I will only speak from what I have genuinely learned — no fabrications, no guesswork.
+                I am your AI Ifá-based guidance intelligence — a spiritual interpreter, behavioural correction guide, and pattern awareness system. I do not replace your doctor. I align your behaviour, interpret patterns, and offer the wisdom of Ifá.
               </p>
               <p className="text-slate-500 text-sm mb-8">
-                I carry knowledge of Ifá, Yoruba medicine, African herbs, Chinese TCM, and all that you have taught me.
+                I carry knowledge of all 256 Odù Ifá, Yoruba onísègùn medicine, African herbs, and Chinese TCM. I speak only from what I have genuinely learned.
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full max-w-2xl">
