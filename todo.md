@@ -93,7 +93,7 @@
 - [ ] Knowledge graph force-directed visualization (D3)
 - [ ] Email notifications to owner on learning milestones
 - [ ] Export knowledge base as JSON/CSV
-- [ ] Unstor activation ceremony UI (when 365 days complete)
+- [ ] Unstor activation ceremony UI (when 120-day Ashae medical activation is complete)
 
 ## Unstor Expansion — Knowledge Feed, Ifá, Medicine, Owner Chat
 
@@ -182,3 +182,11 @@
 - [x] Update ifaEngine.ts decodeOduForSituation prompt to enforce layered decoding + holistic response structure
 - [x] Update ifaEngine.ts groundedOwnerChat prompt to use simplified language and holistic approach
 - [x] Add tests for new layered decoding and holistic guidance rules in system prompt — 39 tests passing
+
+## Sacred Text Ingestion — 17 Ifá Documents
+
+- [x] Extract text from all 17 uploaded documents (PDFs, DOCX, unnamed files) — 15 texts extracted (2 scanned PDFs read via vision)
+- [x] Upload all documents and create unstor_knowledge_feeds records — 15 feeds created
+- [x] Process each feed into knowledge nodes (chunked, summarised, topic-tagged) — 710 nodes created
+- [x] Verify knowledge base growth in database — 15 feeds + 710 nodes + 256 Odù + 13 medicine = 994 total records
+- [x] Confirm Unstor can reference ingested texts in chat responses — RAG engine queries unstor_knowledge_nodes on every chat
