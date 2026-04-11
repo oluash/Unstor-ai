@@ -1,7 +1,18 @@
-import { eq } from "drizzle-orm";
+import { eq, desc, count, and } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users } from "../drizzle/schema";
-import { ENV } from './_core/env';
+import {
+  InsertUser,
+  users,
+  unstorSessions,
+  unstorPrompts,
+  unstorKnowledgeNodes,
+  unstorKnowledgeEdges,
+  unstorTopicClusters,
+  unstorLearningMetrics,
+  unstorOwnerQueries,
+  InsertUnstorPrompt,
+} from "../drizzle/schema";
+import { ENV } from "./_core/env";
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
@@ -89,4 +100,151 @@ export async function getUserByOpenId(openId: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
-// TODO: add feature queries here as your schema grows.
+// ─── Session Helpers ─────────────────────────────────────────────────────────
+
+export async function getOrCreateSession(
+  sessionKey: string,
+  userOpenId?: string,
+  userName?: string
+) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const existing = await db
+    .select()
+    .from(unstorSessions)
+    .where(eq(unstorSessions.sessionKey, sessionKey))
+    .limit(1);
+
+  if (existing.length > 0) return existing[0];
+
+  await db.insert(unstorSessions).values({
+    sessionKey,
+    userOpenId: userOpenId ?? null,
+    userName: userName ?? null,
+    totalMessages: 0,
+    totalTokensIngested: 0,
+  });
+
+  const created = await db
+    .select()
+    .from(unstorSessions)
+    .where(eq(unstorSessions.sessionKey, sessionKey))
+    .limit(1);
+
+  return created[0] ?? null;
+}
+
+export async function getSessionMessages(sessionId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db
+    .select()
+    .from(unstorPrompts)
+    .where(eq(unstorPrompts.sessionId, sessionId))
+    .orderBy(unstorPrompts.createdAt);
+}
+
+// ─── Prompt Helpers ───────────────────────────────────────────────────────────
+
+export async function insertPrompt(data: InsertUnstorPrompt): Promise<number> {
+  const db = await getDb();
+  if (!db) return -1;
+  const result = await db.insert(unstorPrompts).values(data);
+  return (result as any).insertId ?? -1;
+}
+
+// ─── Knowledge Base Helpers ───────────────────────────────────────────────────
+
+export async function getKnowledgeNodes(limit = 50, offset = 0) {
+  const db = await getDb();
+  if (!db) return [];
+  return db
+    .select()
+    .from(unstorKnowledgeNodes)
+    .orderBy(desc(unstorKnowledgeNodes.frequency))
+    .limit(limit)
+    .offset(offset);
+}
+
+export async function getKnowledgeEdges(limit = 100) {
+  const db = await getDb();
+  if (!db) return [];
+  return db
+    .select()
+    .from(unstorKnowledgeEdges)
+    .orderBy(desc(unstorKnowledgeEdges.strength))
+    .limit(limit);
+}
+
+export async function getTopicClusters() {
+  const db = await getDb();
+  if (!db) return [];
+  return db
+    .select()
+    .from(unstorTopicClusters)
+    .orderBy(desc(unstorTopicClusters.totalFrequency));
+}
+
+export async function getLearningMetrics(limit = 30) {
+  const db = await getDb();
+  if (!db) return [];
+  return db
+    .select()
+    .from(unstorLearningMetrics)
+    .orderBy(desc(unstorLearningMetrics.snapshotDate))
+    .limit(limit);
+}
+
+export async function getOwnerQueryHistory(limit = 20) {
+  const db = await getDb();
+  if (!db) return [];
+  return db
+    .select()
+    .from(unstorOwnerQueries)
+    .orderBy(desc(unstorOwnerQueries.createdAt))
+    .limit(limit);
+}
+
+export async function saveOwnerQuery(data: {
+  ownerOpenId: string;
+  query: string;
+  response: string;
+  matchedNodeIds: number[];
+  matchedTopics: string[];
+  confidenceLevel: number;
+  processingTimeMs: number;
+}) {
+  const db = await getDb();
+  if (!db) return;
+  await db.insert(unstorOwnerQueries).values(data);
+}
+
+export async function getSystemStats() {
+  const db = await getDb();
+  if (!db) return null;
+
+  const [promptCount] = await db.select({ count: count() }).from(unstorPrompts);
+  const [nodeCount] = await db.select({ count: count() }).from(unstorKnowledgeNodes);
+  const [clusterCount] = await db.select({ count: count() }).from(unstorTopicClusters);
+  const [sessionCount] = await db.select({ count: count() }).from(unstorSessions);
+  const [userCount] = await db.select({ count: count() }).from(users);
+
+  return {
+    totalPrompts: promptCount?.count ?? 0,
+    totalNodes: nodeCount?.count ?? 0,
+    totalClusters: clusterCount?.count ?? 0,
+    totalSessions: sessionCount?.count ?? 0,
+    totalUsers: userCount?.count ?? 0,
+  };
+}
+
+export async function getRecentSessions(limit = 20) {
+  const db = await getDb();
+  if (!db) return [];
+  return db
+    .select()
+    .from(unstorSessions)
+    .orderBy(desc(unstorSessions.updatedAt))
+    .limit(limit);
+}
