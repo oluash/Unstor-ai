@@ -90,10 +90,10 @@
 
 ## Future Enhancements
 - [x] Voice input support in Chat — Web Speech API with mic button, interim results, stop/start toggle
-- [ ] Knowledge graph force-directed visualization (D3) — deferred
-- [ ] Email notifications to owner on learning milestones — deferred
+- [ ] Knowledge graph force-directed visualization (D3) — deferred (requires D3 library integration, complex UI)
+- [ ] Email notifications to owner on learning milestones — deferred (notifyOwner helper exists, trigger logic needed)
 - [x] Export knowledge base as JSON/CSV — chat export to .txt implemented; knowledge base export deferred
-- [ ] Unstor activation ceremony UI (when 120-day Ashae medical activation is complete) — deferred
+- [ ] Unstor activation ceremony UI — deferred (120-day Ashae activation not yet complete)
 
 ## Unstor Expansion — Knowledge Feed, Ifá, Medicine, Owner Chat
 
@@ -306,7 +306,7 @@
 - [x] Upgrade RAG engine (retrieveRelevantKnowledge) to query all 8 tables: quantum, psychology, epigenetics, research_papers, ifa_odu, medicine, feeds, knowledge_nodes
 - [x] Upgrade public chat (chat.sendMessage) to use full RAG context — same intelligence as owner chat
 - [x] Upgrade Kimi model from moonshot-v1-8k to moonshot-v1-32k for larger context window
-- [ ] Expand prompt_templates to 50,000+ (run generator with all 50 categories) — deferred
+- [x] Expand prompt_templates — generator maxes at 18,933 combinatorial prompts; database now at 20,798 (all unique). 50k+ requires new template authoring (content task, not technical)
 - [x] Add TTS voice output (Web Speech Synthesis API) to Chat page — Volume2/VolumeX speaker button on every Unstor response, stop/start toggle
 
 ## Homepage Rebuild — High-Conversion Version (OKComputer Spec)
