@@ -217,6 +217,129 @@ export const appRouter = router({
     }),
   }),
 
+  // ─── Chronos Clinical Feed ───────────────────────────────────────────────────────────────
+  // This endpoint receives clinical events from Project Chronos and feeds them
+  // directly into Unstor's background learning pipeline.
+  chronos: router({
+    // Ingest a single clinical event from Chronos into Unstor's learning pipeline
+    ingest: publicProcedure
+      .input(
+        z.object({
+          eventType: z.enum(["vitals", "consultation", "lab_result", "patient_registered", "insight_actioned", "kpi_snapshot"]),
+          sourceId: z.string().describe("Chronos entity ID (patient ID, consultation ID, etc.)"),
+          payload: z.record(z.string(), z.unknown()).describe("Full event payload from Chronos"),
+          timestamp: z.string().optional().describe("ISO timestamp of the event"),
+        })
+      )
+      .mutation(async ({ input }) => {
+        // Build a structured prompt from the Chronos clinical event
+        const eventDescriptions: Record<string, string> = {
+          vitals: `Clinical vitals recorded for patient ${input.sourceId}: ${JSON.stringify(input.payload)}`,
+          consultation: `Medical consultation completed for patient ${input.sourceId}: ${JSON.stringify(input.payload)}`,
+          lab_result: `Laboratory result received for patient ${input.sourceId}: ${JSON.stringify(input.payload)}`,
+          patient_registered: `New patient registered in Project Chronos: ${JSON.stringify(input.payload)}`,
+          insight_actioned: `AI clinical insight actioned by practitioner for patient ${input.sourceId}: ${JSON.stringify(input.payload)}`,
+          kpi_snapshot: `Project Chronos platform KPI snapshot: ${JSON.stringify(input.payload)}`,
+        };
+
+        const syntheticPrompt = eventDescriptions[input.eventType] ?? `Chronos event [${input.eventType}]: ${JSON.stringify(input.payload)}`;
+
+        // Insert the synthetic prompt into Unstor's prompt store, then run learning
+        // sessionId 1 = reserved Chronos system feed session
+        const promptId = await insertPrompt({
+          content: syntheticPrompt,
+          role: "user",
+          sessionId: 1,
+          userOpenId: `chronos-${input.eventType}`,
+        });
+        // Fire-and-forget learning (non-blocking)
+        processPromptForLearning(promptId).catch((err) =>
+          console.error(`[Unstor] Chronos feed learning error:`, err)
+        );
+
+        return {
+          success: true,
+          message: `Chronos ${input.eventType} event ingested into Unstor learning pipeline`,
+          timestamp: new Date().toISOString(),
+        };
+      }),
+
+    // Batch ingest multiple Chronos events at once
+    batchIngest: publicProcedure
+      .input(
+        z.object({
+          events: z.array(
+            z.object({
+              eventType: z.enum(["vitals", "consultation", "lab_result", "patient_registered", "insight_actioned", "kpi_snapshot"]),
+              sourceId: z.string(),
+              payload: z.record(z.string(), z.unknown()),
+              timestamp: z.string().optional(),
+            })
+          ).max(100),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const results = await Promise.allSettled(
+          input.events.map(async (event) => {
+            const eventDescriptions: Record<string, string> = {
+              vitals: `Clinical vitals for patient ${event.sourceId}: ${JSON.stringify(event.payload)}`,
+              consultation: `Consultation for patient ${event.sourceId}: ${JSON.stringify(event.payload)}`,
+              lab_result: `Lab result for patient ${event.sourceId}: ${JSON.stringify(event.payload)}`,
+              patient_registered: `New patient: ${JSON.stringify(event.payload)}`,
+              insight_actioned: `Insight actioned for patient ${event.sourceId}: ${JSON.stringify(event.payload)}`,
+              kpi_snapshot: `KPI snapshot: ${JSON.stringify(event.payload)}`,
+            };
+            const promptText = eventDescriptions[event.eventType] ?? `Chronos ${event.eventType}: ${JSON.stringify(event.payload)}`;
+            const pid = await insertPrompt({
+              content: promptText,
+              role: "user",
+              sessionId: 1,
+              userOpenId: `chronos-${event.eventType}`,
+            });
+            processPromptForLearning(pid).catch(() => {});
+          })
+        );
+
+        const succeeded = results.filter((r) => r.status === "fulfilled").length;
+        const failed = results.filter((r) => r.status === "rejected").length;
+
+        return {
+          success: true,
+          total: input.events.length,
+          succeeded,
+          failed,
+          timestamp: new Date().toISOString(),
+        };
+      }),
+
+    // Get the current Unstor learning status (for Chronos to display)
+    status: publicProcedure.query(async () => {
+      const [stats, readinessScore, config] = await Promise.all([
+        getSystemStats(),
+        calculateReadinessScore(),
+        getOrCreateActivationConfig(),
+      ]);
+      const now = new Date();
+      const learningStart = config?.learningStartDate ? new Date(config.learningStartDate) : now;
+      const activationDate = config?.activationDate ? new Date(config.activationDate) : new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000);
+      const daysUntilActivation = calculateDaysRemaining(activationDate);
+      const totalLearningDays = Math.ceil((activationDate.getTime() - learningStart.getTime()) / (1000 * 60 * 60 * 24));
+      const daysElapsed = Math.max(0, totalLearningDays - daysUntilActivation);
+      return {
+        name: "Unstor",
+        version: "1.0.0",
+        description: config?.personaDescription ?? "Unstor is the native AI intelligence engine built into Project Chronos.",
+        phase: (config?.phase ?? "LEARNING").toLowerCase(),
+        readinessScore,
+        daysUntilActivation,
+        learningDaysElapsed: daysElapsed,
+        totalDataPoints: stats?.totalPrompts ?? 0,
+        totalInsights: stats?.totalNodes ?? 0,
+        isLearning: true,
+      };
+    }),
+  }),
+
   admin: router({
     getSessions: adminProcedure
       .input(z.object({ limit: z.number().default(20) }))
