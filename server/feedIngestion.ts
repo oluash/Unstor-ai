@@ -292,48 +292,118 @@ export async function crawlNextUrl(): Promise<boolean> {
 
 // ─── Seed Web Crawl Queue with Learning Sources ───────────────────────────────
 
+// ─── Credibility Scoring ─────────────────────────────────────────────────────
+
+/**
+ * Calculate credibility score (0-100) for a URL based on source authority.
+ * Higher scores = more authoritative, peer-reviewed, or established sources.
+ */
+export function calculateCredibilityScore(url: string, sourceAuthority?: string): number {
+  const u = url.toLowerCase();
+  // Tier 1: Academic / peer-reviewed (90-100)
+  if (u.includes("arxiv.org") || u.includes("pubmed.ncbi.nlm.nih.gov") || u.includes("ncbi.nlm.nih.gov")) return 95;
+  if (u.includes(".edu") || u.includes("scholar.google") || u.includes("researchgate.net")) return 90;
+  if (u.includes("nature.com") || u.includes("science.org") || u.includes("cell.com")) return 95;
+  if (u.includes("jamanetwork.com") || u.includes("nejm.org") || u.includes("thelancet.com")) return 95;
+  // Tier 2: Established reference (75-89)
+  if (u.includes("wikipedia.org")) return 75;
+  if (u.includes("who.int") || u.includes("cdc.gov") || u.includes("nih.gov")) return 88;
+  if (u.includes("mayoclinic.org") || u.includes("webmd.com") || u.includes("healthline.com")) return 72;
+  // Tier 3: Specialist / community (55-74)
+  if (u.includes("ifa") || u.includes("yoruba") || u.includes("orisha")) return 70;
+  if (u.includes("tcm") || u.includes("ayurveda") || u.includes("herbmed")) return 65;
+  if (u.includes("psychology") || u.includes("psychiatry") || u.includes("mindfulness")) return 68;
+  // Tier 4: General web (40-54)
+  return 50;
+}
+
+/**
+ * Classify URL into one of the 8 research domains.
+ */
+export function classifyResearchDomain(url: string, title: string = ""): "quantum_physics" | "ifa_studies" | "yoruba_language" | "alternative_medicine" | "epigenetics" | "medical_education" | "psychology" | "philosophy" | "general" {
+  const text = (url + " " + title).toLowerCase();
+  if (text.match(/quantum|wave.function|entanglement|superposition|qubit|schrodinger/)) return "quantum_physics";
+  if (text.match(/ifa|odu|babalawo|orisha|yoruba.religion|divination/)) return "ifa_studies";
+  if (text.match(/yoruba.language|yoruba.grammar|yoruba.proverb|ede.yoruba/)) return "yoruba_language";
+  if (text.match(/epigenetic|gene.expression|dna.methylation|histone|intergenerational/)) return "epigenetics";
+  if (text.match(/psychology|cognitive|behavioral|cbt|mindfulness|trauma|emotional.intelligence/)) return "psychology";
+  if (text.match(/philosophy|metaphysics|ontology|epistemology|consciousness|ethics/)) return "philosophy";
+  if (text.match(/herbal|traditional.medicine|alternative.medicine|tcm|ayurveda|acupuncture|naturopath/)) return "alternative_medicine";
+  if (text.match(/medical|clinical|health|disease|treatment|diagnosis|pharmacology/)) return "medical_education";
+  return "general";
+}
+
 export async function seedCrawlQueue(): Promise<void> {
   const db = await getDb();
   if (!db) return;
 
-  const SEED_URLS = [
-    // African Traditional Medicine
-    { url: "https://en.wikipedia.org/wiki/African_traditional_medicine", domain: "wikipedia.org", priority: 10 },
-    { url: "https://en.wikipedia.org/wiki/Yoruba_religion", domain: "wikipedia.org", priority: 10 },
-    { url: "https://en.wikipedia.org/wiki/If%C3%A1", domain: "wikipedia.org", priority: 10 },
-    { url: "https://en.wikipedia.org/wiki/Babal%C3%A1wo", domain: "wikipedia.org", priority: 10 },
-    { url: "https://en.wikipedia.org/wiki/Od%C3%B9_If%C3%A1", domain: "wikipedia.org", priority: 10 },
-    // Chinese Traditional Medicine
-    { url: "https://en.wikipedia.org/wiki/Traditional_Chinese_medicine", domain: "wikipedia.org", priority: 9 },
-    { url: "https://en.wikipedia.org/wiki/Chinese_herbology", domain: "wikipedia.org", priority: 9 },
-    { url: "https://en.wikipedia.org/wiki/Acupuncture", domain: "wikipedia.org", priority: 8 },
-    // Herbal Medicine
-    { url: "https://en.wikipedia.org/wiki/Herbal_medicine", domain: "wikipedia.org", priority: 8 },
-    { url: "https://en.wikipedia.org/wiki/Medicinal_plants", domain: "wikipedia.org", priority: 8 },
-    // African Health
-    { url: "https://en.wikipedia.org/wiki/Health_in_Africa", domain: "wikipedia.org", priority: 7 },
-    { url: "https://en.wikipedia.org/wiki/Yoruba_people", domain: "wikipedia.org", priority: 7 },
+  // 8 research domains with curated seed URLs and credibility scores
+  const SEED_URLS: Array<{ url: string; domain: string; priority: number; researchDomain: "quantum_physics" | "ifa_studies" | "yoruba_language" | "alternative_medicine" | "epigenetics" | "medical_education" | "psychology" | "philosophy" | "general"; credibilityScore: number; sourceAuthority: string }> = [
+    // ── IFA STUDIES (domain 1) ──
+    { url: "https://en.wikipedia.org/wiki/If%C3%A1", domain: "wikipedia.org", priority: 10, researchDomain: "ifa_studies", credibilityScore: 75, sourceAuthority: "Wikipedia" },
+    { url: "https://en.wikipedia.org/wiki/Babal%C3%A1wo", domain: "wikipedia.org", priority: 10, researchDomain: "ifa_studies", credibilityScore: 75, sourceAuthority: "Wikipedia" },
+    { url: "https://en.wikipedia.org/wiki/Od%C3%B9_If%C3%A1", domain: "wikipedia.org", priority: 10, researchDomain: "ifa_studies", credibilityScore: 75, sourceAuthority: "Wikipedia" },
+    { url: "https://en.wikipedia.org/wiki/Yoruba_religion", domain: "wikipedia.org", priority: 9, researchDomain: "ifa_studies", credibilityScore: 75, sourceAuthority: "Wikipedia" },
+    // ── YORUBA LANGUAGE (domain 2) ──
+    { url: "https://en.wikipedia.org/wiki/Yoruba_language", domain: "wikipedia.org", priority: 9, researchDomain: "yoruba_language", credibilityScore: 75, sourceAuthority: "Wikipedia" },
+    { url: "https://en.wikipedia.org/wiki/Yoruba_people", domain: "wikipedia.org", priority: 8, researchDomain: "yoruba_language", credibilityScore: 75, sourceAuthority: "Wikipedia" },
+    // ── ALTERNATIVE MEDICINE (domain 3) ──
+    { url: "https://en.wikipedia.org/wiki/African_traditional_medicine", domain: "wikipedia.org", priority: 10, researchDomain: "alternative_medicine", credibilityScore: 75, sourceAuthority: "Wikipedia" },
+    { url: "https://en.wikipedia.org/wiki/Traditional_Chinese_medicine", domain: "wikipedia.org", priority: 9, researchDomain: "alternative_medicine", credibilityScore: 75, sourceAuthority: "Wikipedia" },
+    { url: "https://en.wikipedia.org/wiki/Chinese_herbology", domain: "wikipedia.org", priority: 9, researchDomain: "alternative_medicine", credibilityScore: 75, sourceAuthority: "Wikipedia" },
+    { url: "https://en.wikipedia.org/wiki/Herbal_medicine", domain: "wikipedia.org", priority: 8, researchDomain: "alternative_medicine", credibilityScore: 75, sourceAuthority: "Wikipedia" },
+    { url: "https://en.wikipedia.org/wiki/Ayurveda", domain: "wikipedia.org", priority: 8, researchDomain: "alternative_medicine", credibilityScore: 75, sourceAuthority: "Wikipedia" },
+    { url: "https://en.wikipedia.org/wiki/Medicinal_plants", domain: "wikipedia.org", priority: 8, researchDomain: "alternative_medicine", credibilityScore: 75, sourceAuthority: "Wikipedia" },
+    // ── QUANTUM PHYSICS (domain 4) ──
+    { url: "https://en.wikipedia.org/wiki/Quantum_mechanics", domain: "wikipedia.org", priority: 9, researchDomain: "quantum_physics", credibilityScore: 75, sourceAuthority: "Wikipedia" },
+    { url: "https://en.wikipedia.org/wiki/Quantum_entanglement", domain: "wikipedia.org", priority: 8, researchDomain: "quantum_physics", credibilityScore: 75, sourceAuthority: "Wikipedia" },
+    { url: "https://en.wikipedia.org/wiki/Wave_function_collapse", domain: "wikipedia.org", priority: 8, researchDomain: "quantum_physics", credibilityScore: 75, sourceAuthority: "Wikipedia" },
+    { url: "https://en.wikipedia.org/wiki/Quantum_consciousness", domain: "wikipedia.org", priority: 7, researchDomain: "quantum_physics", credibilityScore: 75, sourceAuthority: "Wikipedia" },
+    { url: "https://en.wikipedia.org/wiki/Quantum_biology", domain: "wikipedia.org", priority: 7, researchDomain: "quantum_physics", credibilityScore: 75, sourceAuthority: "Wikipedia" },
+    // ── EPIGENETICS (domain 5) ──
+    { url: "https://en.wikipedia.org/wiki/Epigenetics", domain: "wikipedia.org", priority: 9, researchDomain: "epigenetics", credibilityScore: 75, sourceAuthority: "Wikipedia" },
+    { url: "https://en.wikipedia.org/wiki/DNA_methylation", domain: "wikipedia.org", priority: 8, researchDomain: "epigenetics", credibilityScore: 75, sourceAuthority: "Wikipedia" },
+    { url: "https://en.wikipedia.org/wiki/Transgenerational_epigenetic_inheritance", domain: "wikipedia.org", priority: 8, researchDomain: "epigenetics", credibilityScore: 75, sourceAuthority: "Wikipedia" },
+    { url: "https://en.wikipedia.org/wiki/Nutritional_epigenomics", domain: "wikipedia.org", priority: 7, researchDomain: "epigenetics", credibilityScore: 75, sourceAuthority: "Wikipedia" },
+    // ── PSYCHOLOGY (domain 6) ──
+    { url: "https://en.wikipedia.org/wiki/Cognitive_behavioral_therapy", domain: "wikipedia.org", priority: 9, researchDomain: "psychology", credibilityScore: 75, sourceAuthority: "Wikipedia" },
+    { url: "https://en.wikipedia.org/wiki/Mindfulness", domain: "wikipedia.org", priority: 8, researchDomain: "psychology", credibilityScore: 75, sourceAuthority: "Wikipedia" },
+    { url: "https://en.wikipedia.org/wiki/Emotional_intelligence", domain: "wikipedia.org", priority: 8, researchDomain: "psychology", credibilityScore: 75, sourceAuthority: "Wikipedia" },
+    { url: "https://en.wikipedia.org/wiki/Trauma-informed_care", domain: "wikipedia.org", priority: 7, researchDomain: "psychology", credibilityScore: 75, sourceAuthority: "Wikipedia" },
+    { url: "https://en.wikipedia.org/wiki/Neuroplasticity", domain: "wikipedia.org", priority: 8, researchDomain: "psychology", credibilityScore: 75, sourceAuthority: "Wikipedia" },
+    // ── MEDICAL EDUCATION (domain 7) ──
+    { url: "https://en.wikipedia.org/wiki/Health_in_Africa", domain: "wikipedia.org", priority: 7, researchDomain: "medical_education", credibilityScore: 75, sourceAuthority: "Wikipedia" },
+    { url: "https://en.wikipedia.org/wiki/Integrative_medicine", domain: "wikipedia.org", priority: 8, researchDomain: "medical_education", credibilityScore: 75, sourceAuthority: "Wikipedia" },
+    { url: "https://en.wikipedia.org/wiki/Evidence-based_medicine", domain: "wikipedia.org", priority: 8, researchDomain: "medical_education", credibilityScore: 75, sourceAuthority: "Wikipedia" },
+    // ── PHILOSOPHY (domain 8) ──
+    { url: "https://en.wikipedia.org/wiki/African_philosophy", domain: "wikipedia.org", priority: 8, researchDomain: "philosophy", credibilityScore: 75, sourceAuthority: "Wikipedia" },
+    { url: "https://en.wikipedia.org/wiki/Ubuntu_philosophy", domain: "wikipedia.org", priority: 7, researchDomain: "philosophy", credibilityScore: 75, sourceAuthority: "Wikipedia" },
+    { url: "https://en.wikipedia.org/wiki/Consciousness", domain: "wikipedia.org", priority: 7, researchDomain: "philosophy", credibilityScore: 75, sourceAuthority: "Wikipedia" },
   ];
 
+  let added = 0;
   for (const seed of SEED_URLS) {
     // Check if already queued
     const existing = await db
       .select()
       .from(webCrawlQueue)
-      .where(eq(webCrawlQueue.domain, seed.domain))
-      .limit(100);
+      .where(eq(webCrawlQueue.url, seed.url))
+      .limit(1);
 
-    const alreadyQueued = existing.some(e => e.url === seed.url);
-    if (!alreadyQueued) {
+    if (!existing.length) {
       await db.insert(webCrawlQueue).values({
         url: seed.url,
         domain: seed.domain,
         depth: 0,
         priority: seed.priority,
         status: "queued",
+        researchDomain: seed.researchDomain,
+        credibilityScore: seed.credibilityScore,
+        sourceAuthority: seed.sourceAuthority,
       });
+      added++;
     }
   }
 
-  console.log("[Unstor Crawler] Seed URLs loaded into crawl queue");
+  console.log(`[Unstor Crawler] Seed URLs loaded: ${added} new URLs across 8 research domains`);
 }

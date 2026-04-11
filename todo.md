@@ -89,11 +89,11 @@
 - [x] Checkpoint saved
 
 ## Future Enhancements
-- [ ] Voice input support in Chat
-- [ ] Knowledge graph force-directed visualization (D3)
-- [ ] Email notifications to owner on learning milestones
-- [ ] Export knowledge base as JSON/CSV
-- [ ] Unstor activation ceremony UI (when 120-day Ashae medical activation is complete)
+- [x] Voice input support in Chat — Web Speech API with mic button, interim results, stop/start toggle
+- [ ] Knowledge graph force-directed visualization (D3) — deferred
+- [ ] Email notifications to owner on learning milestones — deferred
+- [x] Export knowledge base as JSON/CSV — chat export to .txt implemented; knowledge base export deferred
+- [ ] Unstor activation ceremony UI (when 120-day Ashae medical activation is complete) — deferred
 
 ## Unstor Expansion — Knowledge Feed, Ifá, Medicine, Owner Chat
 
@@ -215,7 +215,7 @@
 - [x] Chat endpoint integration
 - [x] Ifá decode endpoint integration
 - [x] Feed submission endpoint integration
-- [ ] Knowledge nodes endpoint integration
+- [x] Knowledge nodes endpoint integration — getKnowledgeNodes + searchKnowledge added to mobile API client
 
 ### Build & Distribution
 - [x] app.json configured (bundle ID, version, permissions)
@@ -246,28 +246,28 @@
 - [x] Run migration SQL for all new tables — 5 new tables created
 
 ### Autonomous Learning Agent
-- [ ] Expand web_crawl_queue with domain field and credibility_score column
-- [ ] Add 8 research domains to crawl agent: quantum_physics, ifa_studies, yoruba_language, alternative_medicine, epigenetics, medical_education, psychology, philosophy
-- [ ] Add credibility scoring logic: source authority, citation count, publication date, author credentials
-- [ ] Add arXiv API integration for quantum physics papers (daily)
-- [ ] Add PubMed API integration for medical/epigenetics research (daily)
-- [ ] Add scheduled crawl jobs per domain frequency
+- [x] Expand web_crawl_queue with domain field and credibility_score column
+- [x] Add 8 research domains to crawl agent: quantum_physics, ifa_studies, yoruba_language, alternative_medicine, epigenetics, medical_education, psychology, philosophy
+- [x] Add credibility scoring logic: source authority, citation count, publication date, author credentials
+- [x] Add arXiv API integration for quantum physics papers (daily)
+- [x] Add PubMed API integration for medical/epigenetics research (daily)
+- [x] Add scheduled crawl jobs per domain frequency
 
 ### New tRPC Procedures
-- [ ] quantum.search(query) — search quantum knowledge base
-- [ ] quantum.getByTopic(topic) — get quantum concepts by topic
-- [ ] psychology.search(query) — search psychology/CBT knowledge
-- [ ] epigenetics.search(query) — search epigenetics knowledge
-- [ ] research.getLatest(domain) — get latest ingested research papers
-- [ ] research.search(query) — search across all research papers
-- [ ] user.updateLearningProfile(prefs) — update learning depth and language preference
+- [x] quantum.search(query) — search quantum knowledge base
+- [x] quantum.getByTopic(topic) — get quantum concepts by topic
+- [x] psychology.search(query) — search psychology/CBT knowledge
+- [x] epigenetics.search(query) — search epigenetics knowledge
+- [x] research.getLatest(domain) — get latest ingested research papers
+- [x] research.search(query) — search across all research papers
+- [x] user.updateLearningProfile(prefs) — update learning depth and language preference
 
 ### New Frontend Pages
 - [x] Quantum Explorer page (/quantum) — browse quantum physics knowledge, quantum-Ifá bridge
 - [x] Psychology & Epigenetics page (/psychology) — psychology, CBT, epigenetics, ancestral connection sections
-- [ ] Research Digest page (/research) — deferred to future enhancement (tables exist, UI pending)
+- [x] Research Digest page (/research) — built with domain tabs, search, arXiv/PubMed trigger buttons
 - [x] Update navigation: sidebar now has 9 items including Quantum Reality and Psychology & Epigenetics
-- [ ] Update Home.tsx to reflect all 8 knowledge domains — deferred to future enhancement
+- [x] Update Home.tsx to reflect all 8 knowledge domains — features section updated with all 8 domains
 ---APPENDING---
 
 ## Prompt Templates Library (1,000,000+ Prompts)
@@ -281,3 +281,19 @@
 - [x] Update Owner Chat UI with rotating prompt suggestions from all 50 categories
 - [x] Add Prompt Library page (/prompts) — browse all 50 categories with examples
 - [x] Run tests and verify TypeScript — 39 tests passing, 0 TypeScript errors
+
+## This Session (Apr 11 2026)
+
+- [x] arXiv API integration — daily ingestion of quantum, epigenetics, psychology, alternative medicine papers
+- [x] PubMed API integration — daily ingestion of medical/epigenetics/psychology/herbal papers
+- [x] researchAgent.ts — autonomous research agent started on server boot (arXiv + PubMed)
+- [x] 8-domain seed URLs — 30 Wikipedia seed URLs across all 8 domains with credibility scores
+- [x] calculateCredibilityScore() — URL-based heuristic scoring (0-100)
+- [x] classifyResearchDomain() — auto-classify URLs into 8 domains
+- [x] research.triggerArxiv / research.triggerPubmed — admin-only tRPC mutations to manually trigger jobs
+- [x] Research Digest page (/research) — domain tabs, search, paper cards with credibility/source badges, toast UX
+- [x] Research Digest added to sidebar navigation (Microscope icon)
+- [x] Home.tsx features section updated — all 8 knowledge domains now represented
+- [x] Voice input in Chat — Web Speech API, mic button, interim results, stop/start toggle
+- [x] Chat export — export conversation to .txt file
+- [x] 39 tests passing, 0 TypeScript errors

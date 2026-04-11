@@ -600,6 +600,20 @@ export const appRouter = router({
   }),
 
   research: router({
+    triggerArxiv: adminProcedure
+      .mutation(async () => {
+        const { runArxivJob } = await import("./researchAgent");
+        const result = await runArxivJob();
+        return { message: `arXiv job complete: ${result.ingested} ingested, ${result.skipped} skipped`, ...result };
+      }),
+
+    triggerPubmed: adminProcedure
+      .mutation(async () => {
+        const { runPubmedJob } = await import("./researchAgent");
+        const result = await runPubmedJob();
+        return { message: `PubMed job complete: ${result.ingested} ingested, ${result.skipped} skipped`, ...result };
+      }),
+
     getLatest: protectedProcedure
       .input(z.object({ domain: z.string().optional(), limit: z.number().default(10) }))
       .query(async ({ input }) => {

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "wouter";
 import { getLoginUrl } from "@/const";
-import { Brain, MessageSquare, BarChart3, Search, Shield, Zap, ArrowRight, Lock } from "lucide-react";
+import { Brain, MessageSquare, BarChart3, Search, Shield, Zap, ArrowRight, Lock, Atom, Dna, BookOpen, Globe, Microscope, Sparkles } from "lucide-react";
 
 const UNSTOR_AVATAR = "https://d2xsxph8kpxj0f.cloudfront.net/310519663246644329/WtjdqCZuUAjS52crCAfDKK/unstor-avatar-o6axhgpSuTHquWi5bcWcYG.webp";
 
@@ -55,12 +55,14 @@ export default function Home() {
   const { data: stats } = trpc.status.getStats.useQuery();
 
   const features = [
-    { icon: Brain, title: "Ifá-Based Guidance", description: "Unstor decodes all 256 Odù Ifá and applies their wisdom to real life situations — as a symbolic guide for reflection, not a diviner." },
-    { icon: MessageSquare, title: "Unified Health Intelligence", description: "Doctors treat. AI observes. Tradition supports. Unstor aligns behaviour. A four-layer system where every role is respected and no boundary is crossed." },
-    { icon: BarChart3, title: "Knowledge Graph", description: "Every feed, book, and conversation builds a dynamic knowledge graph — topics cluster, patterns emerge, understanding deepens over time." },
-    { icon: Search, title: "Herbal Medicine Library", description: "Deep knowledge of Yoruba onísègùn, African traditional medicine, and Chinese TCM — always presented as supportive, never as cures or prescriptions." },
-    { icon: Shield, title: "Safety-First Design", description: "Unstor never overrides doctors or treatment plans. It escalates danger signs and always defers to qualified practitioners." },
-    { icon: Zap, title: "Activation Countdown", description: "After one full year of learning, Unstor activates — ready to serve as a unified human health intelligence system on Ashae." },
+    { icon: BookOpen, title: "Ifá Studies & Odù Decoding", description: "All 256 Odù Ifá decoded in 5 layers: etymology, literal meaning, symbolic meaning, message, and personal application. Symbolic guidance only — no opele casting." },
+    { icon: Globe, title: "Yoruba Language & Culture", description: "Tone marks, dialectal variations (Oyo, Ekiti, Ijesha), proverbs, and seamless Yoruba-English code-switching. Unstor speaks the language of the tradition." },
+    { icon: Search, title: "Alternative & Herbal Medicine", description: "Yoruba onísègùn, African traditional medicine, Chinese TCM, and Ayurveda — always presented as supportive, never as cures. Practitioner disclaimer always included." },
+    { icon: Atom, title: "Quantum Physics & Consciousness", description: "Odù as probability fields, wave-function collapse, Orí as quantum observer. Quantum biology, entanglement, and the science of intention — bridged to Ifá wisdom." },
+    { icon: Dna, title: "Epigenetics & Systems Biology", description: "Gene expression, DNA methylation, intergenerational trauma, nutritional epigenomics. How your ancestors' experiences live in your biology — and how to shift them." },
+    { icon: Brain, title: "Psychology & Behavioural Science", description: "CBT, mindfulness, neuroplasticity, emotional intelligence, and trauma-informed care. Unstor identifies behavioural patterns and guides correction through all dimensions." },
+    { icon: Microscope, title: "Autonomous Research Agent", description: "Daily ingestion of peer-reviewed papers from arXiv and PubMed across all 8 domains. Unstor's knowledge grows continuously, scored by source credibility." },
+    { icon: Shield, title: "Philosophy & Consciousness", description: "African philosophy, Ubuntu, metaphysics, and the nature of consciousness. Unstor bridges ancient wisdom traditions with modern philosophical inquiry." },
   ];
 
   return (

@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, PanelLeft, MessageCircle, BookOpen, Rss, FlaskConical, Brain, Atom, Shield, Library } from "lucide-react";
+import { LayoutDashboard, LogOut, PanelLeft, MessageCircle, BookOpen, Rss, FlaskConical, Brain, Atom, Shield, Library, Microscope } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
@@ -35,6 +35,7 @@ const menuItems = [
   { icon: Atom, label: "Quantum Reality", path: "/quantum" },
   { icon: Brain, label: "Psychology & Epigenetics", path: "/psychology" },
   { icon: Library, label: "Prompt Library", path: "/prompts" },
+  { icon: Microscope, label: "Research Digest", path: "/research" },
   { icon: Rss, label: "Feed Manager", path: "/feed", adminOnly: true },
   { icon: FlaskConical, label: "Knowledge Base", path: "/knowledge" },
   { icon: Shield, label: "Admin", path: "/admin", adminOnly: true },

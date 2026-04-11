@@ -1,0 +1,3 @@
+ALTER TABLE `web_crawl_queue` ADD `researchDomain` enum('quantum_physics','ifa_studies','yoruba_language','alternative_medicine','epigenetics','medical_education','psychology','philosophy','general') DEFAULT 'general';--> statement-breakpoint
+ALTER TABLE `web_crawl_queue` ADD `credibilityScore` int DEFAULT 50;--> statement-breakpoint
+ALTER TABLE `web_crawl_queue` ADD `sourceAuthority` varchar(128);

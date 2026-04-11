@@ -36,6 +36,13 @@
       "when": 1775936380562,
       "tag": "0004_typical_nico_minoru",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1775937208251,
+      "tag": "0005_nosy_the_renegades",
+      "breakpoints": true
     }
   ]
 }

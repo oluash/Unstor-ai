@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "wouter";
-import { Brain, ArrowLeft, Loader2, User, Sparkles, Send } from "lucide-react";
+import { Brain, ArrowLeft, Loader2, User, Sparkles, Send, Mic, MicOff, Download } from "lucide-react";
 import { Streamdown } from "streamdown";
 import { nanoid } from "nanoid";
 import { toast } from "sonner";
@@ -35,14 +35,84 @@ function TypingIndicator() {
   );
 }
 
+// Extend Window type for SpeechRecognition
+interface ISpeechRecognition extends EventTarget {
+  lang: string;
+  interimResults: boolean;
+  maxAlternatives: number;
+  start(): void;
+  stop(): void;
+  onresult: ((event: any) => void) | null;
+  onerror: ((event: any) => void) | null;
+  onend: (() => void) | null;
+}
+
+declare global {
+  interface Window {
+    SpeechRecognition?: new () => ISpeechRecognition;
+    webkitSpeechRecognition?: new () => ISpeechRecognition;
+  }
+}
+
 export default function Chat() {
   const { user } = useAuth();
   const [sessionKey] = useState(() => `session_${nanoid()}`);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const recognitionRef = useRef<ISpeechRecognition | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const startVoiceInput = () => {
+    const SpeechRecognitionAPI = window.SpeechRecognition ?? window.webkitSpeechRecognition;
+    if (!SpeechRecognitionAPI) {
+      toast.error("Voice input is not supported in this browser.");
+      return;
+    }
+    if (isRecording) {
+      recognitionRef.current?.stop();
+      setIsRecording(false);
+      return;
+    }
+    const recognition = new SpeechRecognitionAPI();
+    recognition.lang = "en-US";
+    recognition.interimResults = true;
+    recognition.maxAlternatives = 1;
+    recognition.onresult = (event: any) => {
+      const transcript = Array.from(event.results as any[])
+        .map((r: any) => r[0].transcript)
+        .join("");
+      setInput(transcript);
+    };
+    recognition.onerror = () => {
+      toast.error("Voice recognition error. Please try again.");
+      setIsRecording(false);
+    };
+    recognition.onend = () => setIsRecording(false);
+    recognition.start();
+    recognitionRef.current = recognition;
+    setIsRecording(true);
+  };
+
+  const exportConversation = () => {
+    if (!messages.length) {
+      toast.error("No messages to export.");
+      return;
+    }
+    const lines = messages.map(m =>
+      `[${m.timestamp.toLocaleTimeString()}] ${m.role === "user" ? "You" : "Unstor"}: ${m.content}`
+    );
+    const blob = new Blob([lines.join("\n\n")], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `unstor-chat-${new Date().toISOString().slice(0, 10)}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success("Conversation exported.");
+  };
 
   // Dynamic prompt suggestions from the library
   const { data: dynamicSuggestions } = trpc.prompts.getRandom.useQuery({ count: 6 });
@@ -207,13 +277,28 @@ export default function Chat() {
       <div className="border-t border-border/50 bg-background/80 backdrop-blur-sm">
         <div className="container max-w-3xl py-4">
           <div className="flex gap-3 items-end">
+            {/* Voice input button */}
+            <Button
+              onClick={startVoiceInput}
+              size="icon"
+              variant="outline"
+              title={isRecording ? "Stop recording" : "Voice input"}
+              className={`w-[52px] h-[52px] rounded-xl flex-shrink-0 transition-all ${
+                isRecording
+                  ? "border-red-500/60 bg-red-500/10 text-red-400 hover:bg-red-500/20 animate-pulse"
+                  : "border-border text-muted-foreground hover:text-foreground hover:border-primary/40"
+              }`}
+              disabled={isLoading}
+            >
+              {isRecording ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+            </Button>
             <div className="flex-1 relative">
               <Textarea
                 ref={textareaRef}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Message Unstor..."
+                placeholder={isRecording ? "Listening..." : "Message Unstor..."}
                 className="resize-none min-h-[52px] max-h-[200px] bg-card border-border focus:border-primary/50 text-foreground placeholder:text-muted-foreground rounded-xl pr-4 py-3 custom-scrollbar"
                 rows={1}
                 disabled={isLoading}
@@ -232,10 +317,21 @@ export default function Chat() {
               )}
             </Button>
           </div>
-          <p className="text-xs text-muted-foreground text-center mt-2">
-            <Sparkles className="w-3 h-3 inline mr-1 text-primary" />
-            Every conversation deepens Unstor's knowledge
-          </p>
+          <div className="flex items-center justify-between mt-2">
+            <p className="text-xs text-muted-foreground">
+              <Sparkles className="w-3 h-3 inline mr-1 text-primary" />
+              Every conversation deepens Unstor's knowledge
+            </p>
+            {messages.length > 0 && (
+              <button
+                onClick={exportConversation}
+                className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 transition-colors"
+              >
+                <Download className="w-3 h-3" />
+                Export
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>
