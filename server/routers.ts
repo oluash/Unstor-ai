@@ -18,6 +18,11 @@ import {
   getRecentSessions,
 } from "./db";
 import { kimiChat } from "./kimi";
+import { processFeed, crawlNextUrl, seedCrawlQueue } from "./feedIngestion";
+import { decodeOduForSituation, queryMedicineKnowledge, groundedOwnerChat } from "./ifaEngine";
+import { getDb } from "./db";
+import { unstorKnowledgeFeeds, webCrawlQueue, ifaOdu, medicineKnowledge } from "../drizzle/schema";
+import { eq, desc } from "drizzle-orm";
 import {
   processPromptForLearning,
   calculateReadinessScore,
@@ -338,6 +343,150 @@ export const appRouter = router({
         isLearning: true,
       };
     }),
+  }),
+
+  // ─── Feed Ingestion ───────────────────────────────────────────────────────
+  feed: router({
+    submit: adminProcedure
+      .input(
+        z.object({
+          feedType: z.enum(["url", "pdf", "text", "book", "data"]),
+          title: z.string().optional(),
+          sourceUrl: z.string().optional(),
+          rawContent: z.string().optional(),
+          tags: z.array(z.string()).optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        const db = await getDb();
+        if (!db) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database unavailable" });
+        const [result] = await db.insert(unstorKnowledgeFeeds).values({
+          feedType: input.feedType,
+          title: input.title,
+          sourceUrl: input.sourceUrl,
+          rawContent: input.rawContent,
+          status: "pending",
+          chunkCount: 0,
+          nodesCreated: 0,
+          wordCount: 0,
+          tags: input.tags ?? [],
+          submittedBy: ctx.user.openId,
+        });
+        const feedId = (result as any).insertId;
+        // Process asynchronously
+        processFeed(feedId).catch(console.error);
+        return { feedId, message: "Feed submitted — Unstor is learning from it now." };
+      }),
+
+    list: adminProcedure
+      .input(z.object({ limit: z.number().default(20), offset: z.number().default(0) }))
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) return { feeds: [], total: 0 };
+        const feeds = await db
+          .select()
+          .from(unstorKnowledgeFeeds)
+          .orderBy(desc(unstorKnowledgeFeeds.createdAt))
+          .limit(input.limit)
+          .offset(input.offset);
+        return { feeds, total: feeds.length };
+      }),
+
+    triggerCrawl: adminProcedure.mutation(async () => {
+      const crawled = await crawlNextUrl();
+      return { crawled, message: crawled ? "Crawled one URL successfully" : "No URLs in queue" };
+    }),
+
+    seedCrawlQueue: adminProcedure.mutation(async () => {
+      await seedCrawlQueue();
+      return { message: "Crawl queue seeded with learning sources" };
+    }),
+
+    crawlQueue: adminProcedure
+      .input(z.object({ limit: z.number().default(20) }))
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) return [];
+        return db
+          .select()
+          .from(webCrawlQueue)
+          .orderBy(desc(webCrawlQueue.createdAt))
+          .limit(input.limit);
+      }),
+  }),
+
+  // ─── Ifá & Medicine Knowledge ─────────────────────────────────────────────
+  ifa: router({
+    decodeOdu: adminProcedure
+      .input(z.object({ situation: z.string(), oduName: z.string().optional() }))
+      .mutation(async ({ input }) => {
+        return decodeOduForSituation(input.situation, input.oduName);
+      }),
+
+    listOdu: adminProcedure
+      .input(z.object({ limit: z.number().default(50), offset: z.number().default(0) }))
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) return [];
+        return db.select().from(ifaOdu).limit(input.limit).offset(input.offset);
+      }),
+
+    searchOdu: adminProcedure
+      .input(z.object({ query: z.string() }))
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) return [];
+        const { like, or } = await import("drizzle-orm");
+        return db
+          .select()
+          .from(ifaOdu)
+          .where(
+            or(
+              like(ifaOdu.primaryName, `%${input.query}%`),
+              like(ifaOdu.summary, `%${input.query}%`)
+            )
+          )
+          .limit(20);
+      }),
+
+    queryMedicine: adminProcedure
+      .input(z.object({ query: z.string(), tradition: z.string().optional() }))
+      .query(async ({ input }) => {
+        return queryMedicineKnowledge(input.query, input.tradition);
+      }),
+
+    listMedicine: adminProcedure
+      .input(z.object({ tradition: z.string().optional(), limit: z.number().default(50) }))
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) return [];
+        if (input.tradition) {
+          const { eq } = await import("drizzle-orm");
+          return db
+            .select()
+            .from(medicineKnowledge)
+            .where(eq(medicineKnowledge.tradition, input.tradition as any))
+            .limit(input.limit);
+        }
+        return db.select().from(medicineKnowledge).limit(input.limit);
+      }),
+  }),
+
+  // ─── Grounded Owner Chat ──────────────────────────────────────────────────
+  groundedChat: router({
+    send: adminProcedure
+      .input(
+        z.object({
+          message: z.string().min(1).max(4000),
+          conversationHistory: z
+            .array(z.object({ role: z.enum(["user", "assistant"]), content: z.string() }))
+            .optional()
+            .default([]),
+        })
+      )
+      .mutation(async ({ input }) => {
+        return groundedOwnerChat(input.message, input.conversationHistory);
+      }),
   }),
 
   admin: router({

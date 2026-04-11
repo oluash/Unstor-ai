@@ -175,3 +175,104 @@ export const unstorOwnerQueries = mysqlTable("unstor_owner_queries", {
 });
 
 export type UnstorOwnerQuery = typeof unstorOwnerQueries.$inferSelect;
+
+/**
+ * Knowledge feeds — URLs, books, PDFs, raw text submitted by owner for Unstor to learn from
+ */
+export const unstorKnowledgeFeeds = mysqlTable("unstor_knowledge_feeds", {
+  id: int("id").autoincrement().primaryKey(),
+  feedType: mysqlEnum("feedType", ["url", "pdf", "text", "book", "data"]).notNull(),
+  title: varchar("title", { length: 512 }),
+  sourceUrl: text("sourceUrl"),
+  rawContent: text("rawContent"),
+  processedContent: text("processedContent"),
+  status: mysqlEnum("status", ["pending", "processing", "learned", "failed"]).default("pending").notNull(),
+  errorMessage: text("errorMessage"),
+  chunkCount: int("chunkCount").default(0).notNull(),
+  nodesCreated: int("nodesCreated").default(0).notNull(),
+  wordCount: int("wordCount").default(0).notNull(),
+  tags: json("tags").$type<string[]>(),
+  submittedBy: varchar("submittedBy", { length: 64 }),
+  processedAt: timestamp("processedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type UnstorKnowledgeFeed = typeof unstorKnowledgeFeeds.$inferSelect;
+export type InsertUnstorKnowledgeFeed = typeof unstorKnowledgeFeeds.$inferInsert;
+
+/**
+ * Ifá Odù — all 256 Odù of Ifá with full knowledge
+ */
+export const ifaOdu = mysqlTable("ifa_odu", {
+  id: int("id").autoincrement().primaryKey(),
+  oduNumber: int("oduNumber").notNull().unique(),
+  primaryName: varchar("primaryName", { length: 128 }).notNull(),
+  alternateNames: json("alternateNames").$type<string[]>(),
+  category: varchar("category", { length: 64 }),
+  majorOdu: boolean("majorOdu").default(false).notNull(),
+  parentOdu: varchar("parentOdu", { length: 128 }),
+  eseVerses: text("eseVerses"),
+  taboos: text("taboos"),
+  prescriptions: text("prescriptions"),
+  lifeApplications: text("lifeApplications"),
+  themes: json("themes").$type<string[]>(),
+  herbs: json("herbs").$type<string[]>(),
+  offerings: json("offerings").$type<string[]>(),
+  colors: json("colors").$type<string[]>(),
+  numbers: json("numbers").$type<number[]>(),
+  deities: json("deities").$type<string[]>(),
+  summary: text("summary"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type IfaOdu = typeof ifaOdu.$inferSelect;
+
+/**
+ * Medicine knowledge — African herbs, Chinese TCM, Yoruba onísègùn tradition
+ */
+export const medicineKnowledge = mysqlTable("medicine_knowledge", {
+  id: int("id").autoincrement().primaryKey(),
+  tradition: mysqlEnum("tradition", ["african", "chinese_tcm", "ifa_yoruba", "ayurvedic", "other"]).notNull(),
+  herbName: varchar("herbName", { length: 256 }).notNull(),
+  localNames: json("localNames").$type<string[]>(),
+  scientificName: varchar("scientificName", { length: 256 }),
+  category: varchar("category", { length: 128 }),
+  uses: text("uses"),
+  preparation: text("preparation"),
+  dosage: text("dosage"),
+  contraindications: text("contraindications"),
+  interactions: text("interactions"),
+  properties: json("properties").$type<string[]>(),
+  conditions: json("conditions").$type<string[]>(),
+  bodyParts: json("bodyParts").$type<string[]>(),
+  relatedOdu: json("relatedOdu").$type<string[]>(),
+  sources: json("sources").$type<string[]>(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type MedicineKnowledge = typeof medicineKnowledge.$inferSelect;
+
+/**
+ * Web crawl queue — URLs queued for autonomous background learning
+ */
+export const webCrawlQueue = mysqlTable("web_crawl_queue", {
+  id: int("id").autoincrement().primaryKey(),
+  url: text("url").notNull(),
+  domain: varchar("domain", { length: 256 }),
+  depth: int("depth").default(0).notNull(),
+  priority: int("priority").default(5).notNull(),
+  status: mysqlEnum("status", ["queued", "crawling", "done", "failed", "skipped"]).default("queued").notNull(),
+  contentHash: varchar("contentHash", { length: 64 }),
+  extractedText: text("extractedText"),
+  nodesCreated: int("nodesCreated").default(0).notNull(),
+  errorMessage: text("errorMessage"),
+  crawledAt: timestamp("crawledAt"),
+  nextCrawlAt: timestamp("nextCrawlAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type WebCrawlQueue = typeof webCrawlQueue.$inferSelect;

@@ -9,6 +9,9 @@ import Chat from "./pages/Chat";
 import Admin from "./pages/Admin";
 import KnowledgeExplorer from "./pages/KnowledgeExplorer";
 import OwnerInspection from "./pages/OwnerInspection";
+import FeedManager from "./pages/FeedManager";
+import IfaExplorer from "./pages/IfaExplorer";
+import OwnerChat from "./pages/OwnerChat";
 
 function Router() {
   return (
@@ -18,6 +21,9 @@ function Router() {
       <Route path="/admin" component={Admin} />
       <Route path="/knowledge" component={KnowledgeExplorer} />
       <Route path="/inspect" component={OwnerInspection} />
+      <Route path="/feed" component={FeedManager} />
+      <Route path="/ifa" component={IfaExplorer} />
+      <Route path="/owner-chat" component={OwnerChat} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>

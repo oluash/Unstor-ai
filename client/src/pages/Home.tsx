@@ -80,6 +80,9 @@ export default function Home() {
                 <Link href="/admin"><Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">Dashboard</Button></Link>
                 <Link href="/inspect"><Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">Inspect</Button></Link>
                 <Link href="/knowledge"><Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">Knowledge</Button></Link>
+                <Link href="/feed"><Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">Feed</Button></Link>
+                <Link href="/ifa"><Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">Ifá</Button></Link>
+                <Link href="/owner-chat"><Button variant="ghost" size="sm" className="bg-primary/10 text-primary hover:bg-primary/20">Owner Chat</Button></Link>
               </>
             )}
             {!isAuthenticated ? (

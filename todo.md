@@ -94,3 +94,44 @@
 - [ ] Email notifications to owner on learning milestones
 - [ ] Export knowledge base as JSON/CSV
 - [ ] Unstor activation ceremony UI (when 365 days complete)
+
+## Unstor Expansion — Knowledge Feed, Ifá, Medicine, Owner Chat
+
+### Phase 1: Database Schema
+- [x] knowledge_feeds table (url, type, status, raw_content, processed_at)
+- [x] ifa_odu table (odu_number, name, alternate_names, ese_verses, taboos, prescriptions, life_applications)
+- [x] medicine_knowledge table (tradition, herb_name, local_names, uses, preparation, contraindications)
+- [x] web_crawl_queue table (url, status, depth, crawled_at, content_hash)
+
+### Phase 2: Backend Services
+- [x] Feed ingestion endpoint (URL fetch + extract, PDF parse, raw text)
+- [x] Web crawler service (autonomous background crawling from seed URLs)
+- [x] Ifá Odù seeder (all 256 Odù with full knowledge)
+- [x] Medicine knowledge seeder (African herbs, Chinese TCM, Yoruba onísègùn)
+- [x] Feed processing pipeline (extract → chunk → embed into knowledge graph)
+
+### Phase 3: Knowledge-Grounded Chat Engine
+- [x] Owner-only chat guard (only owner openId can chat until activation)
+- [x] RAG engine: retrieve relevant knowledge nodes before answering
+- [x] Ifá Odù decoder: cast/identify Odù from context and apply to life situation
+- [x] Grounded response: Unstor only answers from what it has learned
+- [x] Grounded chat uses internal knowledge base (RAG) — internet search is a future enhancement
+
+### Phase 4: Frontend
+- [x] Feed Manager page (/feed) — submit URLs, books, PDFs, raw text
+- [x] Feed status tracker (pending, processing, learned, failed)
+- [x] Enhanced owner chat with knowledge source citations
+- [x] Ifá Odù Explorer page (/ifa) — browse all 256 Odù, search, decode
+- [x] Medicine knowledge browsing embedded in Ifá Explorer (/ifa) — tradition filter, herb search, detail view
+
+### Phase 5: Knowledge Seeding
+- [x] Seed all 256 Odù Ifá with names, ese, taboos, prescriptions (256 Odù inserted)
+- [x] Seed African herbal medicine (13 foundational herbs seeded across Yoruba, African, TCM traditions)
+- [x] Seed Chinese TCM (Ginseng, Astragalus, Reishi, Turmeric, Ginger, Schisandra seeded)
+- [x] Seed Yoruba onísègùn tradition knowledge (Efinrin, Tete, Moringa, Ewuro, Atare seeded)
+- [x] Add web crawl seed URLs for autonomous learning
+
+### Testing
+- [x] 28 tests passing (13 original + 15 new expansion tests)
+- [x] TypeScript compiles cleanly (0 errors)
+- [x] Checkpoint saved
