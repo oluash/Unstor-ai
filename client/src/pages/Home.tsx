@@ -19,11 +19,11 @@ function CountdownTimer({ daysRemaining, progressPercent, readinessScore }: {
       <div className="relative space-y-6">
         <div className="flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-primary learning-pulse" />
-          <span className="text-xs font-medium text-primary uppercase tracking-widest">Silent Learning Mode Active</span>
+          <span className="text-xs font-medium text-primary uppercase tracking-widest">Active · Ashae Medical Activation Countdown</span>
         </div>
         <div>
           <div className="text-7xl font-display font-bold gradient-text leading-none">{daysRemaining}</div>
-          <div className="text-muted-foreground mt-1 text-sm">days until activation</div>
+          <div className="text-muted-foreground mt-1 text-sm">days until full medical guidance on Ashae</div>
         </div>
         <div className="space-y-2">
           <div className="flex justify-between text-xs text-muted-foreground">
@@ -40,8 +40,8 @@ function CountdownTimer({ daysRemaining, progressPercent, readinessScore }: {
             <div className="text-xs text-muted-foreground mt-0.5">Readiness Score</div>
           </div>
           <div className="bg-muted/50 rounded-xl p-4">
-            <div className="text-2xl font-display font-bold text-foreground">365</div>
-            <div className="text-xs text-muted-foreground mt-0.5">Day Learning Cycle</div>
+            <div className="text-2xl font-display font-bold text-foreground">120</div>
+            <div className="text-xs text-muted-foreground mt-0.5">Day Ashae Medical Activation</div>
           </div>
         </div>
       </div>
@@ -71,7 +71,7 @@ export default function Home() {
           <div className="flex items-center gap-3">
             <img src={UNSTOR_AVATAR} alt="Unstor" className="w-8 h-8 rounded-lg object-cover" />
             <span className="font-display font-semibold text-foreground">Unstor</span>
-            <Badge variant="outline" className="text-xs border-primary/30 text-primary">Learning</Badge>
+            <Badge variant="outline" className="text-xs border-primary/30 text-primary">Active</Badge>
           </div>
           <div className="flex items-center gap-3">
             <Link href="/chat"><Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">Chat</Button></Link>
@@ -103,7 +103,7 @@ export default function Home() {
             <div className="space-y-4">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-primary/30 bg-primary/5 text-xs text-primary font-medium">
                 <span className="w-1.5 h-1.5 rounded-full bg-primary learning-pulse" />
-                Year One: Silent Learning Phase
+                Active Now · Ashae Medical Guidance Unlocks in 4 Months
               </div>
               <h1 className="text-5xl lg:text-6xl font-display font-bold leading-tight">
                 Meet <span className="gradient-text">Unstor</span><br />A New Intelligence

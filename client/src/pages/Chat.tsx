@@ -228,7 +228,7 @@ export default function Chat() {
           </div>
           <p className="text-xs text-muted-foreground text-center mt-2">
             <Sparkles className="w-3 h-3 inline mr-1 text-primary" />
-            Every message feeds Unstor's silent learning engine
+            Every conversation deepens Unstor's knowledge
           </p>
         </div>
       </div>

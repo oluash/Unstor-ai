@@ -1,12 +1,13 @@
 /**
- * Unstor Silent Learning Pipeline
+ * Unstor Learning Pipeline
  *
  * This is the core of Unstor's intelligence growth system. Every prompt and
  * response flowing through the system is processed here — topics are extracted,
  * knowledge nodes are created or updated, patterns are identified, and the
  * knowledge graph is continuously expanded.
  *
- * This pipeline runs silently in the background. Users never see it operating.
+ * Unstor is active and responds immediately. The 120-day (4-month) countdown
+ * governs when full medical advice/suggestions unlock on the Ashae platform.
  */
 
 import { eq, sql, and, like, desc, count } from "drizzle-orm";
@@ -536,19 +537,18 @@ export async function getOrCreateActivationConfig() {
     return existing[0];
   }
 
-  // Create initial config: learning starts now, activates in 1 year
+  // Create initial config: Unstor is active now; Ashae medical advice unlocks in 120 days (4 months)
   const now = new Date();
-  const activationDate = new Date(now);
-  activationDate.setFullYear(activationDate.getFullYear() + 1);
+  const activationDate = new Date(now.getTime() + 120 * 24 * 60 * 60 * 1000);
 
   await db.insert(unstorActivationConfig).values({
     learningStartDate: now,
     activationDate,
     phase: "LEARNING",
     personaName: "Unstor",
-    personaTagline: "Learning in silence. Evolving in purpose.",
+    personaTagline: "Active now. Full medical guidance on Ashae unlocks in 4 months.",
     personaDescription:
-      "Unstor is an independent AI intelligence built from the ground up. For one full year, it observes, absorbs, and learns from every interaction — silently building its knowledge base before its first autonomous response.",
+      "Unstor is an AI Ifá-based guidance intelligence — active and ready to converse immediately. It carries knowledge of all 256 Odù Ifá, Yoruba onísègùn, African traditional medicine, and Chinese TCM. Full medical advice and clinical suggestions on the Ashae platform unlock after 4 months of deployment.",
   });
 
   const created = await db.select().from(unstorActivationConfig).limit(1);

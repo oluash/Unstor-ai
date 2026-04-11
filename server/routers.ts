@@ -142,14 +142,14 @@ export const appRouter = router({
       if (!config) {
         return {
           phase: "LEARNING" as const,
-          daysRemaining: 365,
+          daysRemaining: 120,
           progressPercent: 0,
           readinessScore: 0,
           personaName: "Unstor",
-          personaTagline: "Learning in silence. Evolving in purpose.",
+          personaTagline: "Active now. Full medical guidance on Ashae unlocks in 4 months.",
           personaDescription: "",
           learningStartDate: new Date(),
-          activationDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+          activationDate: new Date(Date.now() + 120 * 24 * 60 * 60 * 1000),
         };
       }
       const daysRemaining = calculateDaysRemaining(config.activationDate);
@@ -326,7 +326,7 @@ export const appRouter = router({
       ]);
       const now = new Date();
       const learningStart = config?.learningStartDate ? new Date(config.learningStartDate) : now;
-      const activationDate = config?.activationDate ? new Date(config.activationDate) : new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000);
+      const activationDate = config?.activationDate ? new Date(config.activationDate) : new Date(now.getTime() + 120 * 24 * 60 * 60 * 1000);
       const daysUntilActivation = calculateDaysRemaining(activationDate);
       const totalLearningDays = Math.ceil((activationDate.getTime() - learningStart.getTime()) / (1000 * 60 * 60 * 24));
       const daysElapsed = Math.max(0, totalLearningDays - daysUntilActivation);
@@ -472,9 +472,9 @@ export const appRouter = router({
       }),
   }),
 
-  // ─── Grounded Owner Chat ──────────────────────────────────────────────────
+   // ─── Grounded Owner Chat ──────────────────────────────────────────────
   groundedChat: router({
-    send: adminProcedure
+    send: protectedProcedure
       .input(
         z.object({
           message: z.string().min(1).max(4000),

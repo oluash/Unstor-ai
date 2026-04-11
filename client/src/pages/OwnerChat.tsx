@@ -69,22 +69,22 @@ export default function OwnerChat() {
     );
   }
 
-  if (!isAuthenticated || user?.role !== "admin") {
+  if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-[#0a0a0f] flex flex-col items-center justify-center px-4">
         <div className="text-center max-w-md">
           <div className="w-20 h-20 rounded-full bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center mx-auto mb-6">
             <Lock className="w-8 h-8 text-indigo-400" />
           </div>
-          <h2 className="text-2xl font-bold text-white mb-3">Owner-Only Access</h2>
+          <h2 className="text-2xl font-bold text-white mb-3">Sign In to Chat with Unstor</h2>
           <p className="text-slate-400 mb-2">
-            Unstor is in its <strong className="text-indigo-400">Learning Phase</strong>. Direct conversation is restricted to the owner only until the 365-day activation.
+            Unstor is <strong className="text-indigo-400">active and ready</strong> to converse with you now. Sign in to begin.
           </p>
           <p className="text-slate-500 text-sm mb-6">
-            Unstor will only respond based on what it has genuinely learned — no generic AI answers.
+            Unstor carries knowledge of all 256 Odù Ifá, Yoruba medicine, African herbs, and Chinese TCM.
           </p>
           <Button asChild className="bg-indigo-600 hover:bg-indigo-700">
-            <a href={getLoginUrl()}>Sign In as Owner</a>
+            <a href={getLoginUrl()}>Sign In</a>
           </Button>
         </div>
       </div>
@@ -144,7 +144,7 @@ export default function OwnerChat() {
               </div>
               <div>
                 <span className="text-white font-semibold text-sm">Unstor</span>
-                <p className="text-xs text-indigo-400">Learning Mode · Owner Chat</p>
+                <p className="text-xs text-indigo-400">Active · Grounded Chat</p>
               </div>
             </div>
           </div>

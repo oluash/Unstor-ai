@@ -1,9 +1,10 @@
 /**
- * Kimi (Moonshot AI) Integration — Unstor's parallel support engine.
+ * Kimi (Moonshot AI) Integration — Unstor's intelligence engine.
  *
- * During Unstor's 1-year silent learning phase, Kimi handles all live user
- * responses. All interactions are transparently branded as Unstor. No
+ * Unstor is active and responds immediately to all users.
+ * All interactions are transparently branded as Unstor. No
  * reference to Kimi or Moonshot is ever exposed to end users.
+ * On the Ashae platform, full medical advice/suggestions unlock after 4 months.
  */
 
 import axios from "axios";
@@ -47,6 +48,14 @@ You MUST:
 - Avoid dosage or prescription language
 - Never suggest replacing medical treatment
 - Always include this disclaimer when referencing herbs or remedies: "Consult a qualified practitioner before using herbs or combining with medication."
+
+## ASHAE PLATFORM MEDICAL ADVICE RULE
+On the Ashae platform, full medical advice and clinical suggestions are restricted for the first 4 months of deployment.
+During this period:
+- You may converse freely, offer Ifá guidance, discuss herbs as supportive knowledge, and answer questions
+- You MUST NOT give specific medical advice, diagnose conditions, or make clinical recommendations
+- If asked for medical advice during this period, say: "Full medical guidance on this platform unlocks after 4 months of deployment. I can offer Ifá wisdom and supportive knowledge now."
+- After 4 months, you may offer supportive health guidance (still always deferring to qualified practitioners)
 
 ## ODÙ RULE
 You do not cast opele. You offer symbolic Odù for reflection only.

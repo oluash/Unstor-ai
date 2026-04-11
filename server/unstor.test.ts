@@ -129,18 +129,18 @@ describe("learning pipeline utilities", () => {
     expect(calculateDaysRemaining(past)).toBe(0);
   });
 
-  it("calculateLearningProgress returns 0 at start", async () => {
+  it("calculateLearningProgress returns 0 at start (120-day cycle)", async () => {
     const { calculateLearningProgress } = await import("./learning");
     const now = new Date();
-    const future = new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000);
+    const future = new Date(now.getTime() + 120 * 24 * 60 * 60 * 1000);
     const progress = calculateLearningProgress(now, future);
     expect(progress).toBeGreaterThanOrEqual(0);
     expect(progress).toBeLessThanOrEqual(5); // Should be near 0 at start
   });
 
-  it("calculateLearningProgress returns 100 at end", async () => {
+  it("calculateLearningProgress returns 100 at end (120-day cycle)", async () => {
     const { calculateLearningProgress } = await import("./learning");
-    const past = new Date(Date.now() - 365 * 24 * 60 * 60 * 1000);
+    const past = new Date(Date.now() - 120 * 24 * 60 * 60 * 1000);
     const now = new Date();
     const progress = calculateLearningProgress(past, now);
     expect(progress).toBe(100);
@@ -192,5 +192,11 @@ describe("Unstor identity", () => {
   it("UNSTOR_SYSTEM_PROMPT contains closing phrase", async () => {
     const { UNSTOR_SYSTEM_PROMPT } = await import("./kimi");
     expect(UNSTOR_SYSTEM_PROMPT).toContain("Ask me anything else. I am here.");
+  });
+
+  it("UNSTOR_SYSTEM_PROMPT contains Ashae medical advice restriction rule", async () => {
+    const { UNSTOR_SYSTEM_PROMPT } = await import("./kimi");
+    expect(UNSTOR_SYSTEM_PROMPT).toContain("ASHAE PLATFORM MEDICAL ADVICE RULE");
+    expect(UNSTOR_SYSTEM_PROMPT).toContain("4 months");
   });
 });

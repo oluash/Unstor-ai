@@ -137,7 +137,7 @@ export default function Admin() {
                 <span className="w-2.5 h-2.5 rounded-full bg-primary learning-pulse" />
                 <div>
                   <div className="font-display font-semibold text-foreground">
-                    {activation.phase === "LEARNING" ? "Silent Learning Phase" : "Active Phase"}
+                    {activation.phase === "LEARNING" ? "Active · Ashae Medical Activation Countdown" : "Fully Active Phase"}
                   </div>
                   <div className="text-xs text-muted-foreground mt-0.5">
                     {activation.daysRemaining} days remaining · {activation.progressPercent}% complete

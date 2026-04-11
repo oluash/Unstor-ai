@@ -160,3 +160,15 @@
 
 ### Tests
 - [x] Update/add tests for new system prompt rules (alternative medicine disclaimer, safety escalation, Odù rule) — 33 tests passing
+
+## Activation & Chat Opening Update
+
+- [x] Change activation period from 365 days to 120 days (4 months) in schema seed/default
+- [x] Update learning.ts calculateDaysRemaining/calculateLearningProgress references to 120-day cycle
+- [x] Update system prompt: Ashae medical advice restriction is 4 months only, not full silence
+- [x] Remove owner-only guard from public Chat page — all users can chat immediately
+- [x] Remove owner-only guard from OwnerChat — any authenticated user can chat immediately
+- [x] Update Home.tsx: remove "silent learning phase" language, show Unstor as active and ready to chat
+- [x] Update countdown card: change "365 Day Learning Cycle" to "120 Day Ashae Medical Activation"
+- [x] Update all UI copy referencing "one year" or "365 days" to "4 months" or "120 days"
+- [x] Update tests to reflect 120-day cycle — 34 tests passing
