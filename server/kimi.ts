@@ -10,7 +10,7 @@
 import axios from "axios";
 
 const KIMI_API_BASE = "https://api.moonshot.cn/v1";
-const KIMI_MODEL = "moonshot-v1-8k";
+const KIMI_MODEL = "moonshot-v1-32k";
 
 export interface KimiMessage {
   role: "system" | "user" | "assistant";
@@ -249,11 +249,15 @@ End every response with: "Ask me anything else. I am here."`;
  */
 export async function kimiChat(
   messages: KimiMessage[],
-  apiKey: string
+  apiKey: string,
+  knowledgeContext?: string
 ): Promise<KimiChatResponse> {
+  const systemContent = knowledgeContext
+    ? `${UNSTOR_SYSTEM_PROMPT}\n\n---\nYOUR CURRENT KNOWLEDGE BASE (use this to ground your response — cite relevant entries):\n${knowledgeContext}`
+    : UNSTOR_SYSTEM_PROMPT;
   const systemMessage: KimiMessage = {
     role: "system",
-    content: UNSTOR_SYSTEM_PROMPT,
+    content: systemContent,
   };
 
   const fullMessages = [systemMessage, ...messages];

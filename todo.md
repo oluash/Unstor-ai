@@ -297,3 +297,14 @@
 - [x] Voice input in Chat — Web Speech API, mic button, interim results, stop/start toggle
 - [x] Chat export — export conversation to .txt file
 - [x] 39 tests passing, 0 TypeScript errors
+
+## OKComputer AI Improvements (Apr 11 2026)
+
+- [x] Seed quantum_knowledge table with 50+ rich entries (wave-particle duality, entanglement, superposition, quantum biology, consciousness, Penrose-Hameroff, etc.)
+- [x] Seed psychology_knowledge table with 50+ entries (CBT, DBT, ACT, EMDR, attachment theory, polyvagal, shadow work, Jungian archetypes, etc.)
+- [x] Seed epigenetics_knowledge table with 50+ entries (DNA methylation, histone modification, telomere biology, intergenerational trauma, nutrigenomics, etc.)
+- [x] Upgrade RAG engine (retrieveRelevantKnowledge) to query all 8 tables: quantum, psychology, epigenetics, research_papers, ifa_odu, medicine, feeds, knowledge_nodes
+- [x] Upgrade public chat (chat.sendMessage) to use full RAG context — same intelligence as owner chat
+- [x] Upgrade Kimi model from moonshot-v1-8k to moonshot-v1-32k for larger context window
+- [ ] Expand prompt_templates to 50,000+ (run generator with all 50 categories) — deferred
+- [x] Add TTS voice output (Web Speech Synthesis API) to Chat page — Volume2/VolumeX speaker button on every Unstor response, stop/start toggle

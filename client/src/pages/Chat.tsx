@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "wouter";
-import { Brain, ArrowLeft, Loader2, User, Sparkles, Send, Mic, MicOff, Download } from "lucide-react";
+import { Brain, ArrowLeft, Loader2, User, Sparkles, Send, Mic, MicOff, Download, Volume2, VolumeX } from "lucide-react";
 import { Streamdown } from "streamdown";
 import { nanoid } from "nanoid";
 import { toast } from "sonner";
@@ -61,7 +61,35 @@ export default function Chat() {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
+  const [speakingIndex, setSpeakingIndex] = useState<number | null>(null);
   const recognitionRef = useRef<ISpeechRecognition | null>(null);
+
+  const speakMessage = (text: string, index: number) => {
+    if (!window.speechSynthesis) {
+      toast.error("Text-to-speech is not supported in this browser.");
+      return;
+    }
+    if (speakingIndex === index) {
+      window.speechSynthesis.cancel();
+      setSpeakingIndex(null);
+      return;
+    }
+    window.speechSynthesis.cancel();
+    // Strip markdown symbols for cleaner speech
+    const cleanText = text.replace(/[*#`_~>]/g, "").replace(/\n+/g, " ");
+    const utterance = new SpeechSynthesisUtterance(cleanText);
+    utterance.rate = 0.95;
+    utterance.pitch = 1.0;
+    utterance.volume = 1.0;
+    const voices = window.speechSynthesis.getVoices();
+    const preferred = voices.find(v => v.lang.startsWith("en") && v.name.toLowerCase().includes("natural"))
+      ?? voices.find(v => v.lang.startsWith("en"));
+    if (preferred) utterance.voice = preferred;
+    utterance.onend = () => setSpeakingIndex(null);
+    utterance.onerror = () => setSpeakingIndex(null);
+    setSpeakingIndex(index);
+    window.speechSynthesis.speak(utterance);
+  };
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -255,12 +283,21 @@ export default function Chat() {
                 ) : (
                   <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
                 )}
-                <div
-                  className={`text-xs mt-2 ${
-                    message.role === "user" ? "text-primary-foreground/60" : "text-muted-foreground"
-                  }`}
-                >
-                  {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                <div className={`flex items-center justify-between mt-2 gap-2 ${message.role === "user" ? "flex-row-reverse" : ""}`}>
+                  <span className={`text-xs ${message.role === "user" ? "text-primary-foreground/60" : "text-muted-foreground"}`}>
+                    {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                  </span>
+                  {message.role === "assistant" && (
+                    <button
+                      onClick={() => speakMessage(message.content, index)}
+                      title={speakingIndex === index ? "Stop speaking" : "Listen to response"}
+                      className="text-muted-foreground hover:text-primary transition-colors"
+                    >
+                      {speakingIndex === index
+                        ? <VolumeX className="w-3 h-3" />
+                        : <Volume2 className="w-3 h-3" />}
+                    </button>
+                  )}
                 </div>
               </div>
             </div>

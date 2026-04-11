@@ -19,7 +19,7 @@ import {
 } from "./db";
 import { kimiChat } from "./kimi";
 import { processFeed, crawlNextUrl, seedCrawlQueue } from "./feedIngestion";
-import { decodeOduForSituation, queryMedicineKnowledge, groundedOwnerChat } from "./ifaEngine";
+import { decodeOduForSituation, queryMedicineKnowledge, groundedOwnerChat, retrieveRelevantKnowledge } from "./ifaEngine";
 import { getDb } from "./db";
 import { unstorKnowledgeFeeds, webCrawlQueue, ifaOdu, medicineKnowledge } from "../drizzle/schema";
 import { eq, desc } from "drizzle-orm";
@@ -101,12 +101,47 @@ export const appRouter = router({
           processedByLearning: false,
         });
 
+        // Retrieve relevant knowledge from all 8 domain tables for grounded response
+        const knowledge = await retrieveRelevantKnowledge(input.message, 8);
+        let knowledgeContext = "";
+        if (knowledge.nodes.length > 0) {
+          knowledgeContext += "\n## Knowledge Nodes:\n";
+          knowledge.nodes.forEach(n => { knowledgeContext += `- **${n.topic}**: ${n.summary ?? ""}\n`; });
+        }
+        if (knowledge.ifaOduResults.length > 0) {
+          knowledgeContext += "\n## Relevant Ifá Odù:\n";
+          knowledge.ifaOduResults.forEach(o => { knowledgeContext += `- **${o.primaryName}** (#${o.oduNumber}): ${o.summary ?? ""}\n`; });
+        }
+        if (knowledge.medicineResults.length > 0) {
+          knowledgeContext += "\n## Herbal Medicine:\n";
+          knowledge.medicineResults.forEach(m => { knowledgeContext += `- **${m.herbName}** (${m.tradition}): ${m.uses ?? ""}\n`; });
+        }
+        if (knowledge.quantumResults.length > 0) {
+          knowledgeContext += "\n## Quantum Physics:\n";
+          knowledge.quantumResults.forEach(q => { knowledgeContext += `- **${q.topic}**: ${q.plainLanguageSummary ?? q.content?.slice(0, 200) ?? ""}\n`; });
+        }
+        if (knowledge.psychologyResults.length > 0) {
+          knowledgeContext += "\n## Psychology:\n";
+          knowledge.psychologyResults.forEach(p => { knowledgeContext += `- **${p.framework}** (${p.technique ?? ""}): ${p.content?.slice(0, 200) ?? ""}\n`; });
+        }
+        if (knowledge.epigeneticsResults.length > 0) {
+          knowledgeContext += "\n## Epigenetics:\n";
+          knowledge.epigeneticsResults.forEach(e => { knowledgeContext += `- **${e.mechanism}**: ${e.plainLanguageSummary ?? e.content?.slice(0, 200) ?? ""}\n`; });
+        }
+        if (knowledge.researchResults.length > 0) {
+          knowledgeContext += "\n## Research Papers:\n";
+          knowledge.researchResults.forEach(r => { knowledgeContext += `- **${r.title}** (${r.source ?? ""}): ${r.abstract?.slice(0, 200) ?? ""}\n`; });
+        }
+        if (knowledge.feeds.length > 0) {
+          knowledgeContext += "\n## Studied Sources:\n";
+          knowledge.feeds.forEach(f => { knowledgeContext += `- **${f.title ?? "Source"}**: ${f.processedContent?.slice(0, 200) ?? ""}\n`; });
+        }
         const kimiMessages = [
           ...input.history.map((m) => ({ role: m.role as "user" | "assistant", content: m.content })),
           { role: "user" as const, content: input.message },
         ];
 
-        const kimiResponse = await kimiChat(kimiMessages, apiKey);
+        const kimiResponse = await kimiChat(kimiMessages, apiKey, knowledgeContext);
 
         const assistantPromptId = await insertPrompt({
           sessionId: session.id,

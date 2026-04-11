@@ -4,7 +4,16 @@
  * Also handles: RAG-based knowledge-grounded chat for the owner
  */
 import { getDb } from "./db";
-import { ifaOdu, medicineKnowledge, unstorKnowledgeNodes, unstorKnowledgeFeeds } from "../drizzle/schema";
+import {
+  ifaOdu,
+  medicineKnowledge,
+  unstorKnowledgeNodes,
+  unstorKnowledgeFeeds,
+  quantumKnowledge,
+  psychologyKnowledge,
+  epigeneticsKnowledge,
+  researchPapers,
+} from "../drizzle/schema";
 import { eq, like, or, desc } from "drizzle-orm";
 import { invokeLLM } from "./_core/llm";
 
@@ -182,9 +191,13 @@ export async function retrieveRelevantKnowledge(
   feeds: any[];
   ifaOduResults: any[];
   medicineResults: any[];
+  quantumResults: any[];
+  psychologyResults: any[];
+  epigeneticsResults: any[];
+  researchResults: any[];
 }> {
   const db = await getDb();
-  if (!db) return { nodes: [], feeds: [], ifaOduResults: [], medicineResults: [] };
+  if (!db) return { nodes: [], feeds: [], ifaOduResults: [], medicineResults: [], quantumResults: [], psychologyResults: [], epigeneticsResults: [], researchResults: [] };
 
   // Extract keywords from query for search
   const words = query
@@ -198,6 +211,10 @@ export async function retrieveRelevantKnowledge(
   const feeds: any[] = [];
   const ifaOduResults: any[] = [];
   const medicineResults: any[] = [];
+  const quantumResults: any[] = [];
+  const psychologyResults: any[] = [];
+  const epigeneticsResults: any[] = [];
+  const researchResults: any[] = [];
 
   for (const word of words) {
     // Search knowledge nodes
@@ -253,6 +270,26 @@ export async function retrieveRelevantKnowledge(
       )
       .limit(2);
     medicineResults.push(...medResults);
+    // Search quantum knowledge
+    const qResults = await db.select().from(quantumKnowledge).where(
+      or(like(quantumKnowledge.topic, `%${word}%`), like(quantumKnowledge.content, `%${word}%`), like(quantumKnowledge.plainLanguageSummary, `%${word}%`))
+    ).limit(2);
+    quantumResults.push(...qResults);
+    // Search psychology knowledge
+    const pResults = await db.select().from(psychologyKnowledge).where(
+      or(like(psychologyKnowledge.framework, `%${word}%`), like(psychologyKnowledge.content, `%${word}%`), like(psychologyKnowledge.practicalApplication, `%${word}%`))
+    ).limit(2);
+    psychologyResults.push(...pResults);
+    // Search epigenetics knowledge
+    const eResults = await db.select().from(epigeneticsKnowledge).where(
+      or(like(epigeneticsKnowledge.mechanism, `%${word}%`), like(epigeneticsKnowledge.content, `%${word}%`), like(epigeneticsKnowledge.plainLanguageSummary, `%${word}%`))
+    ).limit(2);
+    epigeneticsResults.push(...eResults);
+    // Search research papers
+    const rResults = await db.select().from(researchPapers).where(
+      or(like(researchPapers.title, `%${word}%`), like(researchPapers.abstract, `%${word}%`))
+    ).limit(2);
+    researchResults.push(...rResults);
   }
 
   // Deduplicate by id
@@ -261,11 +298,19 @@ export async function retrieveRelevantKnowledge(
   const uniqueOdu = Array.from(new Map(ifaOduResults.map(o => [o.id, o])).values()).slice(0, 5);
   const uniqueMed = Array.from(new Map(medicineResults.map(m => [m.id, m])).values()).slice(0, 5);
 
+  const uniqueQuantum = Array.from(new Map(quantumResults.map(q => [q.id, q])).values()).slice(0, 4);
+  const uniquePsych = Array.from(new Map(psychologyResults.map(p => [p.id, p])).values()).slice(0, 4);
+  const uniqueEpigen = Array.from(new Map(epigeneticsResults.map(e => [e.id, e])).values()).slice(0, 4);
+  const uniqueResearch = Array.from(new Map(researchResults.map(r => [r.id, r])).values()).slice(0, 4);
   return {
     nodes: uniqueNodes,
     feeds: uniqueFeeds,
     ifaOduResults: uniqueOdu,
     medicineResults: uniqueMed,
+    quantumResults: uniqueQuantum,
+    psychologyResults: uniquePsych,
+    epigeneticsResults: uniqueEpigen,
+    researchResults: uniqueResearch,
   };
 }
 
@@ -286,7 +331,11 @@ export async function groundedOwnerChat(
     knowledge.nodes.length +
     knowledge.feeds.length +
     knowledge.ifaOduResults.length +
-    knowledge.medicineResults.length;
+    knowledge.medicineResults.length +
+    knowledge.quantumResults.length +
+    knowledge.psychologyResults.length +
+    knowledge.epigeneticsResults.length +
+    knowledge.researchResults.length;
 
   // Build knowledge context
   let knowledgeContext = "";
@@ -317,6 +366,33 @@ export async function groundedOwnerChat(
     knowledgeContext += "\n## Herbal Medicine Knowledge:\n";
     knowledge.medicineResults.forEach(m => {
       knowledgeContext += `- **${m.herbName}** (${m.tradition}): ${m.uses ?? ""}\n`;
+    });
+  }
+  if (knowledge.quantumResults.length > 0) {
+    knowledgeContext += "\n## Quantum Physics Knowledge:\n";
+    knowledge.quantumResults.forEach(q => {
+      knowledgeContext += `- **${q.topic}** (${q.subtopic ?? ""}): ${q.plainLanguageSummary ?? q.content?.slice(0, 300) ?? ""}\n`;
+      if (q.ifaBridge) knowledgeContext += `  Ifá Bridge: ${q.ifaBridge}\n`;
+    });
+  }
+  if (knowledge.psychologyResults.length > 0) {
+    knowledgeContext += "\n## Psychology & Behavioural Science:\n";
+    knowledge.psychologyResults.forEach(p => {
+      knowledgeContext += `- **${p.framework}** — ${p.technique ?? ""}: ${p.content?.slice(0, 300) ?? ""}\n`;
+      if (p.practicalApplication) knowledgeContext += `  Practice: ${p.practicalApplication?.slice(0, 200)}\n`;
+    });
+  }
+  if (knowledge.epigeneticsResults.length > 0) {
+    knowledgeContext += "\n## Epigenetics & Systems Biology:\n";
+    knowledge.epigeneticsResults.forEach(e => {
+      knowledgeContext += `- **${e.mechanism}** (${e.genePathway ?? ""}): ${e.plainLanguageSummary ?? e.content?.slice(0, 300) ?? ""}\n`;
+      if (e.ancestralConnection) knowledgeContext += `  Ancestral Connection: ${e.ancestralConnection?.slice(0, 200)}\n`;
+    });
+  }
+  if (knowledge.researchResults.length > 0) {
+    knowledgeContext += "\n## Recent Research Papers:\n";
+    knowledge.researchResults.forEach(r => {
+      knowledgeContext += `- **${r.title}** (${r.source ?? ""}, ${r.publishedDate ? new Date(r.publishedDate).getFullYear() : ""}): ${r.abstract?.slice(0, 250) ?? ""}\n`;
     });
   }
 
@@ -401,6 +477,18 @@ ${knowledgeContext ? `YOUR CURRENT KNOWLEDGE BASE:\n${knowledgeContext}` : "[You
   );
   knowledge.medicineResults.slice(0, 2).forEach(m =>
     sources.push({ type: "medicine", title: `${m.herbName} (${m.tradition})`, relevance: "Herbal knowledge" })
+  );
+  knowledge.quantumResults.slice(0, 2).forEach(q =>
+    sources.push({ type: "quantum", title: q.topic, relevance: `Quantum physics — ${q.difficultyLevel}` })
+  );
+  knowledge.psychologyResults.slice(0, 2).forEach(p =>
+    sources.push({ type: "psychology", title: `${p.framework} — ${p.technique ?? ""}`, relevance: `Evidence: ${p.evidenceLevel}` })
+  );
+  knowledge.epigeneticsResults.slice(0, 2).forEach(e =>
+    sources.push({ type: "epigenetics", title: `${e.mechanism} (${e.genePathway ?? ""})`, relevance: "Epigenetics" })
+  );
+  knowledge.researchResults.slice(0, 2).forEach(r =>
+    sources.push({ type: "research", title: r.title, relevance: r.source ?? "Research paper" })
   );
 
   return {
