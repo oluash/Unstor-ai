@@ -90,7 +90,7 @@
 
 ## Future Enhancements
 - [x] Voice input support in Chat — Web Speech API with mic button, interim results, stop/start toggle
-- [ ] Knowledge graph force-directed visualization (D3) — deferred (requires D3 library integration, complex UI)
+- [x] Knowledge graph force-directed visualization (D3) — D3 force-directed graph with drag, zoom, tooltips, 8-domain colour coding, node size by frequency/confidence, label overlay for high-frequency nodes; Graph tab added to Knowledge Explorer
 - [x] Email notifications to owner on learning milestones — owner.checkMilestones mutation added; Bell button in Admin dashboard; notifies at 25/50/75% readiness, 1k/5k nodes, 30/7/0 days to activation
 - [x] Export knowledge base as JSON/CSV — chat export to .txt implemented; knowledge base export deferred
 - [x] Unstor activation ceremony UI — /activation page built with full ceremony (particles, gradient text, stats, what-changed section, CTAs); Admin dashboard shows pulsing Ceremony button when daysRemaining <= 0; milestone deduplication via milestone_notifications table

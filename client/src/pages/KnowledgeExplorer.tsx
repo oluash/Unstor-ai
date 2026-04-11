@@ -1,4 +1,5 @@
 import { useState } from "react";
+import KnowledgeGraph from "@/components/KnowledgeGraph";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
@@ -72,7 +73,7 @@ function NodeCard({ node }: { node: any }) {
 export default function KnowledgeExplorer() {
   const { user, isAuthenticated, loading } = useAuth();
   const [search, setSearch] = useState("");
-  const [activeTab, setActiveTab] = useState<"nodes" | "clusters">("nodes");
+  const [activeTab, setActiveTab] = useState<"nodes" | "clusters" | "graph">("nodes");
 
   const { data: nodes, isLoading: nodesLoading } = trpc.knowledge.getNodes.useQuery(
     { limit: 100, offset: 0 },
@@ -164,6 +165,13 @@ export default function KnowledgeExplorer() {
               <Layers className="w-3.5 h-3.5 inline mr-1.5" />
               Clusters
             </button>
+            <button
+              onClick={() => setActiveTab("graph")}
+              className={`px-4 py-2.5 text-sm font-medium transition-colors ${activeTab === "graph" ? "bg-primary text-primary-foreground" : "bg-card text-muted-foreground hover:text-foreground"}`}
+            >
+              <TrendingUp className="w-3.5 h-3.5 inline mr-1.5" />
+              Graph
+            </button>
           </div>
         </div>
 
@@ -192,6 +200,9 @@ export default function KnowledgeExplorer() {
             )}
           </div>
         )}
+
+        {/* Graph Tab */}
+        {activeTab === "graph" && <KnowledgeGraph />}
 
         {/* Clusters Tab */}
         {activeTab === "clusters" && (
