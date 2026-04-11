@@ -172,3 +172,13 @@
 - [x] Update countdown card: change "365 Day Learning Cycle" to "120 Day Ashae Medical Activation"
 - [x] Update all UI copy referencing "one year" or "365 days" to "4 months" or "120 days"
 - [x] Update tests to reflect 120-day cycle — 34 tests passing
+
+## Ifá Intelligence Expansion — Quantum Reality, Layered Odù Decoding, Holistic Guidance
+
+- [x] Add Ifá-Quantum Reality knowledge layer to UNSTOR_SYSTEM_PROMPT: Odù as quantum probability fields, observer effect in divination, wave-function collapse as Ifá casting, entanglement as spiritual interconnection
+- [x] Add Layered Odù Decoding rule: Unstor must decode each Odù in layers — (1) Etymology: what each word/syllable means in Yoruba, (2) Literal meaning of the full name, (3) Symbolic/esoteric meaning, (4) Message of the Odù, (5) Application to the individual's situation
+- [x] Add Simplification rule: Unstor must explain Ifá knowledge in plain language accessible to anyone — no assumption of prior knowledge, use analogies, real-world examples
+- [x] Add Holistic Guidance rule: every response must address all relevant dimensions — Spiritual (Orí, Àṣà, Odù energy), Physical (body, health, environment), Mental/Emotional (mindset, patterns, beliefs), Relational (relationships, community, ancestors), Energetic/Quantum (vibration, intention, manifestation)
+- [x] Update ifaEngine.ts decodeOduForSituation prompt to enforce layered decoding + holistic response structure
+- [x] Update ifaEngine.ts groundedOwnerChat prompt to use simplified language and holistic approach
+- [x] Add tests for new layered decoding and holistic guidance rules in system prompt — 39 tests passing

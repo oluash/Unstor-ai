@@ -199,4 +199,43 @@ describe("Unstor identity", () => {
     expect(UNSTOR_SYSTEM_PROMPT).toContain("ASHAE PLATFORM MEDICAL ADVICE RULE");
     expect(UNSTOR_SYSTEM_PROMPT).toContain("4 months");
   });
+
+  it("UNSTOR_SYSTEM_PROMPT contains quantum Ifá knowledge rule", async () => {
+    const { UNSTOR_SYSTEM_PROMPT } = await import("./kimi");
+    expect(UNSTOR_SYSTEM_PROMPT).toContain("IFÁ AND QUANTUM REALITY");
+    expect(UNSTOR_SYSTEM_PROMPT).toContain("quantum probability field");
+    expect(UNSTOR_SYSTEM_PROMPT).toContain("wave function");
+  });
+
+  it("UNSTOR_SYSTEM_PROMPT contains layered Odù decoding rule", async () => {
+    const { UNSTOR_SYSTEM_PROMPT } = await import("./kimi");
+    expect(UNSTOR_SYSTEM_PROMPT).toContain("LAYERED ODÙ DECODING RULE");
+    expect(UNSTOR_SYSTEM_PROMPT).toContain("Layer 1");
+    expect(UNSTOR_SYSTEM_PROMPT).toContain("Layer 2");
+    expect(UNSTOR_SYSTEM_PROMPT).toContain("Layer 5");
+    expect(UNSTOR_SYSTEM_PROMPT).toContain("Etymology");
+  });
+
+  it("UNSTOR_SYSTEM_PROMPT contains simplification rule", async () => {
+    const { UNSTOR_SYSTEM_PROMPT } = await import("./kimi");
+    expect(UNSTOR_SYSTEM_PROMPT).toContain("SIMPLIFICATION RULE");
+    expect(UNSTOR_SYSTEM_PROMPT).toContain("accessible to everyone");
+  });
+
+  it("UNSTOR_SYSTEM_PROMPT contains holistic guidance rule with all 5 dimensions", async () => {
+    const { UNSTOR_SYSTEM_PROMPT } = await import("./kimi");
+    expect(UNSTOR_SYSTEM_PROMPT).toContain("HOLISTIC GUIDANCE RULE");
+    expect(UNSTOR_SYSTEM_PROMPT).toContain("Spiritual");
+    expect(UNSTOR_SYSTEM_PROMPT).toContain("Physical");
+    expect(UNSTOR_SYSTEM_PROMPT).toContain("Mental / Emotional");
+    expect(UNSTOR_SYSTEM_PROMPT).toContain("Relational");
+    expect(UNSTOR_SYSTEM_PROMPT).toContain("Energetic / Quantum");
+  });
+
+  it("UNSTOR_SYSTEM_PROMPT response structure includes layered insight and holistic action", async () => {
+    const { UNSTOR_SYSTEM_PROMPT } = await import("./kimi");
+    expect(UNSTOR_SYSTEM_PROMPT).toContain("Layered Insight");
+    expect(UNSTOR_SYSTEM_PROMPT).toContain("Spiritual action");
+    expect(UNSTOR_SYSTEM_PROMPT).toContain("Energetic action");
+  });
 });
