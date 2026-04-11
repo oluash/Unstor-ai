@@ -375,3 +375,16 @@ export const userLearningProfiles = mysqlTable("user_learning_profiles", {
 });
 
 export type UserLearningProfile = typeof userLearningProfiles.$inferSelect;
+/**
+ * Prompt Templates Library — 50 categories, 18,933+ unique prompts
+ * Generated from the Unstor Prompt Templates Library (1,000,000+ combinations)
+ */
+export const promptTemplates = mysqlTable("prompt_templates", {
+  id: int("id").autoincrement().primaryKey(),
+  category: varchar("category", { length: 128 }).notNull(),
+  categoryLabel: varchar("categoryLabel", { length: 256 }).notNull(),
+  promptText: text("promptText").notNull(),
+  variables: json("variables").$type<string[]>(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+export type PromptTemplate = typeof promptTemplates.$inferSelect;

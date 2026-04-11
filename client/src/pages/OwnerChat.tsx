@@ -38,6 +38,9 @@ export default function OwnerChat() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  // Dynamic prompts from the library — rotate on each page load
+  const { data: libraryPrompts } = trpc.prompts.getRandom.useQuery({ count: 4 });
+
   const sendMessage = trpc.groundedChat.send.useMutation({
     onSuccess: (data: any) => {
       const assistantMessage: Message = {
@@ -192,11 +195,12 @@ export default function OwnerChat() {
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full max-w-2xl">
-                {SUGGESTED_PROMPTS.map((prompt, i) => {
+                {/* Static curated prompts */}
+                {SUGGESTED_PROMPTS.slice(0, 4).map((prompt, i) => {
                   const Icon = prompt.icon;
                   return (
                     <button
-                      key={i}
+                      key={`static-${i}`}
                       onClick={() => handleSuggestedPrompt(prompt.text)}
                       className="flex items-start gap-3 p-3 rounded-xl bg-[#12121a] border border-slate-700/40 hover:border-indigo-500/30 text-left transition-all group"
                     >
@@ -205,6 +209,19 @@ export default function OwnerChat() {
                     </button>
                   );
                 })}
+                {/* Dynamic prompts from the 18,933-prompt library */}
+                {libraryPrompts?.slice(0, 2).map((prompt, i) => (
+                  <button
+                    key={`lib-${i}`}
+                    onClick={() => handleSuggestedPrompt(prompt.promptText)}
+                    className="flex items-start gap-3 p-3 rounded-xl bg-[#12121a] border border-indigo-800/30 hover:border-indigo-500/40 text-left transition-all group"
+                  >
+                    <Star className="w-4 h-4 text-indigo-400 mt-0.5 shrink-0" />
+                    <span className="text-sm text-slate-400 group-hover:text-slate-300">
+                      {prompt.promptText.length > 90 ? prompt.promptText.slice(0, 87) + "..." : prompt.promptText}
+                    </span>
+                  </button>
+                ))}
               </div>
             </div>
           ) : (

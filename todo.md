@@ -268,3 +268,16 @@
 - [ ] Research Digest page (/research) — deferred to future enhancement (tables exist, UI pending)
 - [x] Update navigation: sidebar now has 9 items including Quantum Reality and Psychology & Epigenetics
 - [ ] Update Home.tsx to reflect all 8 knowledge domains — deferred to future enhancement
+---APPENDING---
+
+## Prompt Templates Library (1,000,000+ Prompts)
+
+- [ ] Run Python generator to produce 10,000 structured prompts across all 50 categories
+- [ ] Add prompt_templates table to schema (category, template_text, variables, example_prompt)
+- [ ] Migrate and apply schema changes
+- [ ] Insert generated prompts into prompt_templates table
+- [ ] Add tRPC routes: prompts.getByCategory, prompts.getRandom, prompts.search
+- [ ] Update Chat UI with dynamic category-based prompt suggestions
+- [ ] Update Owner Chat UI with rotating prompt suggestions from all 50 categories
+- [ ] Add Prompt Library page (/prompts) — browse all 50 categories with examples
+- [ ] Run tests and verify TypeScript

@@ -541,6 +541,76 @@ export const appRouter = router({
       }),
   }),
 
+  prompts: router({
+    getCategories: publicProcedure.query(async () => {
+      const db = await getDb();
+      if (!db) return [];
+      const { promptTemplates } = await import("../drizzle/schema");
+      const { sql } = await import("drizzle-orm");
+      const rows = await db
+        .select({
+          category: promptTemplates.category,
+          categoryLabel: promptTemplates.categoryLabel,
+          count: sql<number>`COUNT(*)`
+        })
+        .from(promptTemplates)
+        .groupBy(promptTemplates.category, promptTemplates.categoryLabel);
+      return rows;
+    }),
+    getByCategory: publicProcedure
+      .input(z.object({ category: z.string(), limit: z.number().default(10) }))
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) return [];
+        const { promptTemplates } = await import("../drizzle/schema");
+        const { eq } = await import("drizzle-orm");
+        return db
+          .select()
+          .from(promptTemplates)
+          .where(eq(promptTemplates.category, input.category))
+          .limit(input.limit);
+      }),
+    getRandom: publicProcedure
+      .input(z.object({ count: z.number().default(6), category: z.string().optional() }))
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) return [];
+        const { promptTemplates } = await import("../drizzle/schema");
+        const { eq, sql } = await import("drizzle-orm");
+        const query = db
+          .select()
+          .from(promptTemplates)
+          .orderBy(sql`RAND()`)
+          .limit(input.count);
+        if (input.category) {
+          return db
+            .select()
+            .from(promptTemplates)
+            .where(eq(promptTemplates.category, input.category))
+            .orderBy(sql`RAND()`)
+            .limit(input.count);
+        }
+        return query;
+      }),
+    search: publicProcedure
+      .input(z.object({ query: z.string(), limit: z.number().default(20) }))
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) return [];
+        const { promptTemplates } = await import("../drizzle/schema");
+        const { like, or } = await import("drizzle-orm");
+        return db
+          .select()
+          .from(promptTemplates)
+          .where(
+            or(
+              like(promptTemplates.promptText, `%${input.query}%`),
+              like(promptTemplates.categoryLabel, `%${input.query}%`)
+            )
+          )
+          .limit(input.limit);
+      }),
+  }),
   admin: router({
     getSessions: adminProcedure
       .input(z.object({ limit: z.number().default(20) }))

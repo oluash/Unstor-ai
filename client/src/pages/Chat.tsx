@@ -44,6 +44,9 @@ export default function Chat() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  // Dynamic prompt suggestions from the library
+  const { data: dynamicSuggestions } = trpc.prompts.getRandom.useQuery({ count: 6 });
+
   const sendMessage = trpc.chat.sendMessage.useMutation({
     onSuccess: (data) => {
       setMessages((prev) => [
@@ -125,18 +128,21 @@ export default function Chat() {
                 </p>
               </div>
               <div className="flex flex-wrap gap-2 justify-center pt-2">
-                {[
-                  "What are you learning?",
-                  "Tell me about yourself",
-                  "How does your learning work?",
-                  "What can you help me with?",
-                ].map((suggestion) => (
+                {(dynamicSuggestions && dynamicSuggestions.length > 0
+                  ? dynamicSuggestions.map((s) => s.promptText)
+                  : [
+                      "What are you learning?",
+                      "Tell me about yourself",
+                      "How does your learning work?",
+                      "What can you help me with?",
+                    ]
+                ).map((suggestion) => (
                   <button
                     key={suggestion}
                     onClick={() => setInput(suggestion)}
-                    className="text-xs px-3 py-1.5 rounded-full border border-border hover:border-primary/40 hover:bg-primary/5 text-muted-foreground hover:text-foreground transition-all"
+                    className="text-xs px-3 py-1.5 rounded-full border border-border hover:border-primary/40 hover:bg-primary/5 text-muted-foreground hover:text-foreground transition-all text-left max-w-xs"
                   >
-                    {suggestion}
+                    {suggestion.length > 80 ? suggestion.slice(0, 77) + "..." : suggestion}
                   </button>
                 ))}
               </div>

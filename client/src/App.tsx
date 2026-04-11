@@ -14,6 +14,7 @@ import IfaExplorer from "./pages/IfaExplorer";
 import OwnerChat from "./pages/OwnerChat";
 import QuantumExplorer from "./pages/QuantumExplorer";
 import PsychologyEpigenetics from "./pages/PsychologyEpigenetics";
+import PromptLibrary from "./pages/PromptLibrary";
 
 function Router() {
   return (
@@ -28,6 +29,7 @@ function Router() {
       <Route path="/owner-chat" component={OwnerChat} />
       <Route path="/quantum" component={QuantumExplorer} />
       <Route path="/psychology" component={PsychologyEpigenetics} />
+      <Route path="/prompts" component={PromptLibrary} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>
