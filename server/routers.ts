@@ -513,6 +513,32 @@ export const appRouter = router({
         const rows = await db.select().from(quantumKnowledge).where(eq(quantumKnowledge.id, input.id)).limit(1);
         return rows[0] ?? null;
       }),
+
+    search: protectedProcedure
+      .input(z.object({ query: z.string(), limit: z.number().default(10) }))
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) return [];
+        const { quantumKnowledge } = await import("../drizzle/schema");
+        const { like, or } = await import("drizzle-orm");
+        return db.select().from(quantumKnowledge).where(
+          or(
+            like(quantumKnowledge.topic, `%${input.query}%`),
+            like(quantumKnowledge.content, `%${input.query}%`),
+            like(quantumKnowledge.ifaBridge, `%${input.query}%`)
+          )
+        ).limit(input.limit);
+      }),
+
+    getByTopic: protectedProcedure
+      .input(z.object({ topic: z.string(), limit: z.number().default(10) }))
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) return [];
+        const { quantumKnowledge } = await import("../drizzle/schema");
+        const { like } = await import("drizzle-orm");
+        return db.select().from(quantumKnowledge).where(like(quantumKnowledge.topic, `%${input.topic}%`)).limit(input.limit);
+      }),
   }),
 
   psychology: router({
@@ -528,6 +554,22 @@ export const appRouter = router({
         }
         return db.select().from(psychologyKnowledge).limit(input.limit);
       }),
+
+    search: protectedProcedure
+      .input(z.object({ query: z.string(), limit: z.number().default(10) }))
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) return [];
+        const { psychologyKnowledge } = await import("../drizzle/schema");
+        const { like, or } = await import("drizzle-orm");
+        return db.select().from(psychologyKnowledge).where(
+          or(
+            like(psychologyKnowledge.framework, `%${input.query}%`),
+            like(psychologyKnowledge.content, `%${input.query}%`),
+            like(psychologyKnowledge.practicalApplication, `%${input.query}%`)
+          )
+        ).limit(input.limit);
+      }),
   }),
 
   epigenetics: router({
@@ -539,6 +581,95 @@ export const appRouter = router({
         const { epigeneticsKnowledge } = await import("../drizzle/schema");
         return db.select().from(epigeneticsKnowledge).limit(input.limit);
       }),
+
+    search: protectedProcedure
+      .input(z.object({ query: z.string(), limit: z.number().default(10) }))
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) return [];
+        const { epigeneticsKnowledge } = await import("../drizzle/schema");
+        const { like, or } = await import("drizzle-orm");
+        return db.select().from(epigeneticsKnowledge).where(
+          or(
+            like(epigeneticsKnowledge.genePathway, `%${input.query}%`),
+            like(epigeneticsKnowledge.content, `%${input.query}%`),
+            like(epigeneticsKnowledge.ancestralConnection, `%${input.query}%`)
+          )
+        ).limit(input.limit);
+      }),
+  }),
+
+  research: router({
+    getLatest: protectedProcedure
+      .input(z.object({ domain: z.string().optional(), limit: z.number().default(10) }))
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) return [];
+        const { researchPapers } = await import("../drizzle/schema");
+        const { eq, desc } = await import("drizzle-orm");
+        if (input.domain) {
+          return db.select().from(researchPapers).where(eq(researchPapers.domain, input.domain as any)).orderBy(desc(researchPapers.createdAt)).limit(input.limit);
+        }
+        return db.select().from(researchPapers).orderBy(desc(researchPapers.createdAt)).limit(input.limit);
+      }),
+
+    search: protectedProcedure
+      .input(z.object({ query: z.string(), limit: z.number().default(10) }))
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) return [];
+        const { researchPapers } = await import("../drizzle/schema");
+        const { like, or } = await import("drizzle-orm");
+        return db.select().from(researchPapers).where(
+          or(
+            like(researchPapers.title, `%${input.query}%`),
+            like(researchPapers.abstract, `%${input.query}%`),
+            like(researchPapers.domain, `%${input.query}%`)
+          )
+        ).limit(input.limit);
+      }),
+  }),
+
+  user: router({
+    updateLearningProfile: protectedProcedure
+      .input(z.object({
+        learningDepth: z.enum(["introductory", "intermediate", "advanced"]).optional(),
+        languagePreference: z.enum(["english", "yoruba", "both"]).optional(),
+        domainInterests: z.array(z.string()).optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const db = await getDb();
+        if (!db) return { success: false };
+        const { userLearningProfiles } = await import("../drizzle/schema");
+        const { eq } = await import("drizzle-orm");
+        const existing = await db.select().from(userLearningProfiles).where(eq(userLearningProfiles.userId, ctx.user.id)).limit(1);
+        if (existing.length > 0) {
+          await db.update(userLearningProfiles).set({
+            ...(input.learningDepth && { learningDepth: input.learningDepth }),
+            ...(input.languagePreference && { languagePreference: input.languagePreference }),
+            ...(input.domainInterests && { domainInterests: input.domainInterests }),
+            updatedAt: new Date(),
+          }).where(eq(userLearningProfiles.userId, ctx.user.id));
+        } else {
+          await db.insert(userLearningProfiles).values({
+            userId: ctx.user.id,
+            userOpenId: ctx.user.openId,
+            learningDepth: input.learningDepth ?? "intermediate",
+            languagePreference: input.languagePreference ?? "english",
+            domainInterests: input.domainInterests ?? [],
+          });
+        }
+        return { success: true };
+      }),
+
+    getLearningProfile: protectedProcedure.query(async ({ ctx }) => {
+      const db = await getDb();
+      if (!db) return null;
+      const { userLearningProfiles } = await import("../drizzle/schema");
+      const { eq } = await import("drizzle-orm");
+      const rows = await db.select().from(userLearningProfiles).where(eq(userLearningProfiles.userId, ctx.user.id)).limit(1);
+      return rows[0] ?? null;
+    }),
   }),
 
   prompts: router({

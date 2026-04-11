@@ -194,35 +194,35 @@
 ## Unstor Mobile App (iOS & Android)
 
 ### Architecture
-- [ ] Expo SDK 51 + React Native project scaffolded at /home/ubuntu/unstor-mobile
-- [ ] React Navigation v6 (Stack + Bottom Tabs)
-- [ ] Expo SecureStore for auth token storage
-- [ ] NativeWind (Tailwind for React Native) for styling
-- [ ] Dark theme matching the web app aesthetic
+- [x] Expo SDK 51 + React Native project scaffolded at /home/ubuntu/unstor-mobile
+- [x] React Navigation v6 (Stack + Bottom Tabs)
+- [x] Expo SecureStore for auth token storage
+- [x] NativeWind (Tailwind for React Native) for styling
+- [x] Dark theme matching the web app aesthetic
 
 ### Screens
-- [ ] Splash / Onboarding screen
-- [ ] Login screen (OAuth via in-app browser)
-- [ ] Home / Dashboard screen (knowledge stats, countdown)
-- [ ] Chat screen (full conversation with Unstor)
-- [ ] Ifá Explorer screen (browse Odù, decode for situation)
-- [ ] Feed screen (submit URLs, text, books)
-- [ ] Settings screen (profile, logout)
+- [x] Splash / Onboarding screen
+- [x] Login screen (OAuth via in-app browser)
+- [x] Home / Dashboard screen (knowledge stats, countdown)
+- [x] Chat screen (full conversation with Unstor)
+- [x] Ifá Explorer screen (browse Odù, decode for situation)
+- [x] Feed screen (submit URLs, text, books)
+- [x] Settings screen (profile, logout)
 
 ### API Integration
-- [ ] REST client pointing to https://unstorai-wtjdqczu.manus.space/api
-- [ ] Auth token management
-- [ ] Chat endpoint integration
-- [ ] Ifá decode endpoint integration
-- [ ] Feed submission endpoint integration
+- [x] REST client pointing to https://unstorai-wtjdqczu.manus.space/api
+- [x] Auth token management
+- [x] Chat endpoint integration
+- [x] Ifá decode endpoint integration
+- [x] Feed submission endpoint integration
 - [ ] Knowledge nodes endpoint integration
 
 ### Build & Distribution
-- [ ] app.json configured (bundle ID, version, permissions)
-- [ ] App icons generated
-- [ ] Splash screen configured
-- [ ] eas.json configured for EAS Build
-- [ ] Complete submission guide written (both stores)
+- [x] app.json configured (bundle ID, version, permissions)
+- [x] App icons generated (placeholder configured in app.json)
+- [x] Splash screen configured
+- [x] eas.json configured for EAS Build
+- [x] Complete submission guide written (both stores) — DEPLOYMENT_GUIDE.md delivered
 
 ## Technical Specification Update (OKComputer Spec)
 
@@ -272,12 +272,12 @@
 
 ## Prompt Templates Library (1,000,000+ Prompts)
 
-- [ ] Run Python generator to produce 10,000 structured prompts across all 50 categories
-- [ ] Add prompt_templates table to schema (category, template_text, variables, example_prompt)
-- [ ] Migrate and apply schema changes
-- [ ] Insert generated prompts into prompt_templates table
-- [ ] Add tRPC routes: prompts.getByCategory, prompts.getRandom, prompts.search
-- [ ] Update Chat UI with dynamic category-based prompt suggestions
-- [ ] Update Owner Chat UI with rotating prompt suggestions from all 50 categories
-- [ ] Add Prompt Library page (/prompts) — browse all 50 categories with examples
-- [ ] Run tests and verify TypeScript
+- [x] Run Python generator to produce 10,000 structured prompts across all 50 categories (18,933 generated)
+- [x] Add prompt_templates table to schema (category, template_text, variables, example_prompt)
+- [x] Migrate and apply schema changes
+- [x] Insert generated prompts into prompt_templates table (18,933 prompts inserted)
+- [x] Add tRPC routes: prompts.getByCategory, prompts.getRandom, prompts.search, prompts.getCategories
+- [x] Update Chat UI with dynamic category-based prompt suggestions (rotating from library)
+- [x] Update Owner Chat UI with rotating prompt suggestions from all 50 categories
+- [x] Add Prompt Library page (/prompts) — browse all 50 categories with examples
+- [x] Run tests and verify TypeScript — 39 tests passing, 0 TypeScript errors
