@@ -16,6 +16,7 @@ import QuantumExplorer from "./pages/QuantumExplorer";
 import PsychologyEpigenetics from "./pages/PsychologyEpigenetics";
 import PromptLibrary from "./pages/PromptLibrary";
 import Research from "./pages/Research";
+import Activation from "./pages/Activation";
 
 function Router() {
   return (
@@ -32,6 +33,7 @@ function Router() {
       <Route path="/psychology" component={PsychologyEpigenetics} />
       <Route path="/prompts" component={PromptLibrary} />
       <Route path="/research" component={Research} />
+      <Route path="/activation" component={Activation} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>

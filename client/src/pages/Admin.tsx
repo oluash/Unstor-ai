@@ -6,7 +6,7 @@ import { Link } from "wouter";
 import { getLoginUrl } from "@/const";
 import {
   Brain, ArrowLeft, BarChart3, Users, MessageSquare, Network,
-  Layers, TrendingUp, RefreshCw, Lock, Activity
+  Layers, TrendingUp, RefreshCw, Lock, Activity, Bell, Sparkles
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -39,6 +39,16 @@ export default function Admin() {
   const triggerSnapshot = trpc.owner.triggerSnapshot.useMutation({
     onSuccess: () => { toast.success("Learning snapshot recorded."); refetch(); },
     onError: () => toast.error("Failed to record snapshot."),
+  });
+  const checkMilestones = trpc.owner.checkMilestones.useMutation({
+    onSuccess: (data) => {
+      if (data.notified === 0) {
+        toast.info("No new milestones reached yet.");
+      } else {
+        toast.success(`${data.notified} milestone notification${data.notified > 1 ? 's' : ''} sent.`);
+      }
+    },
+    onError: () => toast.error("Failed to check milestones."),
   });
 
   if (loading) {
@@ -112,6 +122,17 @@ export default function Admin() {
               variant="outline"
               size="sm"
               className="gap-2 text-xs"
+              onClick={() => checkMilestones.mutate()}
+              disabled={checkMilestones.isPending}
+              title="Check and notify owner of learning milestones"
+            >
+              <Bell className={`w-3.5 h-3.5 ${checkMilestones.isPending ? "animate-pulse" : ""}`} />
+              Milestones
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-2 text-xs"
               onClick={() => triggerSnapshot.mutate()}
               disabled={triggerSnapshot.isPending}
             >
@@ -124,6 +145,14 @@ export default function Admin() {
                 Inspect
               </Button>
             </Link>
+            {activation && activation.daysRemaining <= 0 && (
+              <Link href="/activation">
+                <Button size="sm" className="bg-amber-500 hover:bg-amber-600 text-white gap-2 text-xs animate-pulse">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  Ceremony
+                </Button>
+              </Link>
+            )}
           </div>
         </div>
       </header>

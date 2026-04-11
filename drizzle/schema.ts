@@ -391,3 +391,15 @@ export const promptTemplates = mysqlTable("prompt_templates", {
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 export type PromptTemplate = typeof promptTemplates.$inferSelect;
+
+/**
+ * Milestone Notifications — tracks which milestones have been sent to avoid spam
+ */
+export const milestoneNotifications = mysqlTable("milestone_notifications", {
+  id: int("id").autoincrement().primaryKey(),
+  milestoneKey: varchar("milestoneKey", { length: 128 }).notNull().unique(),
+  title: varchar("title", { length: 256 }).notNull(),
+  notifiedAt: timestamp("notifiedAt").defaultNow().notNull(),
+  success: boolean("success").default(true).notNull(),
+});
+export type MilestoneNotification = typeof milestoneNotifications.$inferSelect;

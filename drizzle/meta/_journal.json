@@ -43,6 +43,13 @@
       "when": 1775937208251,
       "tag": "0005_nosy_the_renegades",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1775948984691,
+      "tag": "0006_purple_maggott",
+      "breakpoints": true
     }
   ]
 }

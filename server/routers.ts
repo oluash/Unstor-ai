@@ -23,6 +23,7 @@ import { decodeOduForSituation, queryMedicineKnowledge, groundedOwnerChat, retri
 import { getDb } from "./db";
 import { unstorKnowledgeFeeds, webCrawlQueue, ifaOdu, medicineKnowledge } from "../drizzle/schema";
 import { eq, desc } from "drizzle-orm";
+import { notifyOwner } from "./_core/notification";
 import {
   processPromptForLearning,
   calculateReadinessScore,
@@ -234,6 +235,50 @@ export const appRouter = router({
     triggerSnapshot: adminProcedure.mutation(async () => {
       await recordLearningSnapshot();
       return { success: true };
+    }),
+
+    checkMilestones: adminProcedure.mutation(async () => {
+      const db = await getDb();
+      if (!db) return { milestones: [], notified: 0, errors: [] };
+      const { milestoneNotifications } = await import("../drizzle/schema");
+      const { eq } = await import("drizzle-orm");
+      const [stats, readiness, config] = await Promise.all([
+        getSystemStats(),
+        calculateReadinessScore(),
+        getOrCreateActivationConfig(),
+      ]);
+      const score = readiness ?? 0;
+      const nodeCount = stats?.totalNodes ?? 0;
+      const promptCount = stats?.totalPrompts ?? 0;
+      const daysRemaining = config ? calculateDaysRemaining(config.activationDate) : 120;
+      // Define all milestone thresholds with unique keys
+      const candidates: { key: string; title: string; content: string }[] = [];
+      if (score >= 25) candidates.push({ key: "readiness_25", title: "Readiness 25%", content: `Readiness score reached 25% (${score}%)\n\nNodes: ${nodeCount} | Prompts: ${promptCount} | Days to activation: ${daysRemaining}` });
+      if (score >= 50) candidates.push({ key: "readiness_50", title: "Readiness 50% — Halfway", content: `Readiness score reached 50% (${score}%) — halfway to activation\n\nNodes: ${nodeCount} | Prompts: ${promptCount} | Days to activation: ${daysRemaining}` });
+      if (score >= 75) candidates.push({ key: "readiness_75", title: "Readiness 75% — Approaching Activation", content: `Readiness score reached 75% (${score}%) — approaching activation\n\nNodes: ${nodeCount} | Prompts: ${promptCount} | Days to activation: ${daysRemaining}` });
+      if (nodeCount >= 1000) candidates.push({ key: "nodes_1000", title: "1,000 Knowledge Nodes", content: `Knowledge base surpassed 1,000 nodes (${nodeCount} total)\n\nReadiness: ${score}% | Days to activation: ${daysRemaining}` });
+      if (nodeCount >= 5000) candidates.push({ key: "nodes_5000", title: "5,000 Knowledge Nodes", content: `Knowledge base surpassed 5,000 nodes (${nodeCount} total)\n\nReadiness: ${score}% | Days to activation: ${daysRemaining}` });
+      if (promptCount >= 50000) candidates.push({ key: "prompts_50000", title: "50,000 Prompts Processed", content: `50,000 prompts processed (${promptCount} total)\n\nReadiness: ${score}% | Days to activation: ${daysRemaining}` });
+      if (daysRemaining <= 30) candidates.push({ key: "activation_30d", title: "30 Days to Ashae Activation", content: `30 days until Ashae activation — ${daysRemaining} days remaining\n\nReadiness: ${score}%` });
+      if (daysRemaining <= 7) candidates.push({ key: "activation_7d", title: "7 Days to Ashae Activation — Final Week", content: `7 days until Ashae activation — final week\n\nReadiness: ${score}%` });
+      if (daysRemaining <= 0) candidates.push({ key: "activation_reached", title: "Ashae Activation Window Reached", content: `Ashae activation window reached — readiness: ${score}%\n\nThis is the moment. The system is ready.` });
+      // Deduplicate: only notify for milestones not yet recorded
+      const existing = await db.select({ milestoneKey: milestoneNotifications.milestoneKey }).from(milestoneNotifications);
+      const sentKeys = new Set(existing.map((r) => r.milestoneKey));
+      const unsent = candidates.filter((c) => !sentKeys.has(c.key));
+      const sent: string[] = [];
+      const errors: string[] = [];
+      for (const milestone of unsent) {
+        const success = await notifyOwner({ title: `Unstor: ${milestone.title}`, content: milestone.content });
+        try {
+          await db.insert(milestoneNotifications).values({ milestoneKey: milestone.key, title: milestone.title, success: !!success });
+          if (success) sent.push(milestone.title);
+          else errors.push(`Notification sent but delivery uncertain: ${milestone.title}`);
+        } catch {
+          errors.push(`Failed to record milestone: ${milestone.title}`);
+        }
+      }
+      return { milestones: sent, notified: sent.length, errors };
     }),
   }),
 

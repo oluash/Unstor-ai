@@ -91,9 +91,9 @@
 ## Future Enhancements
 - [x] Voice input support in Chat — Web Speech API with mic button, interim results, stop/start toggle
 - [ ] Knowledge graph force-directed visualization (D3) — deferred (requires D3 library integration, complex UI)
-- [ ] Email notifications to owner on learning milestones — deferred (notifyOwner helper exists, trigger logic needed)
+- [x] Email notifications to owner on learning milestones — owner.checkMilestones mutation added; Bell button in Admin dashboard; notifies at 25/50/75% readiness, 1k/5k nodes, 30/7/0 days to activation
 - [x] Export knowledge base as JSON/CSV — chat export to .txt implemented; knowledge base export deferred
-- [ ] Unstor activation ceremony UI — deferred (120-day Ashae activation not yet complete)
+- [x] Unstor activation ceremony UI — /activation page built with full ceremony (particles, gradient text, stats, what-changed section, CTAs); Admin dashboard shows pulsing Ceremony button when daysRemaining <= 0; milestone deduplication via milestone_notifications table
 
 ## Unstor Expansion — Knowledge Feed, Ifá, Medicine, Owner Chat
 
