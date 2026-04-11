@@ -276,3 +276,102 @@ export const webCrawlQueue = mysqlTable("web_crawl_queue", {
 });
 
 export type WebCrawlQueue = typeof webCrawlQueue.$inferSelect;
+
+/**
+ * Quantum physics knowledge base
+ */
+export const quantumKnowledge = mysqlTable("quantum_knowledge", {
+  id: int("id").autoincrement().primaryKey(),
+  topic: varchar("topic", { length: 256 }).notNull(),
+  subtopic: varchar("subtopic", { length: 256 }),
+  difficultyLevel: mysqlEnum("difficultyLevel", ["introductory", "intermediate", "advanced"]).default("intermediate").notNull(),
+  content: text("content").notNull(),
+  equations: text("equations"),
+  plainLanguageSummary: text("plainLanguageSummary"),
+  ifaBridge: text("ifaBridge"),
+  sources: json("sources").$type<string[]>(),
+  keywords: json("keywords").$type<string[]>(),
+  relatedTopics: json("relatedTopics").$type<string[]>(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type QuantumKnowledge = typeof quantumKnowledge.$inferSelect;
+
+/**
+ * Psychology and behavioural science knowledge base
+ */
+export const psychologyKnowledge = mysqlTable("psychology_knowledge", {
+  id: int("id").autoincrement().primaryKey(),
+  framework: varchar("framework", { length: 128 }).notNull(),
+  technique: varchar("technique", { length: 256 }),
+  evidenceLevel: mysqlEnum("evidenceLevel", ["established", "emerging", "speculative"]).default("established").notNull(),
+  content: text("content").notNull(),
+  practicalApplication: text("practicalApplication"),
+  contraindications: text("contraindications"),
+  sources: json("sources").$type<string[]>(),
+  keywords: json("keywords").$type<string[]>(),
+  conditions: json("conditions").$type<string[]>(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type PsychologyKnowledge = typeof psychologyKnowledge.$inferSelect;
+
+/**
+ * Epigenetics and systems biology knowledge base
+ */
+export const epigeneticsKnowledge = mysqlTable("epigenetics_knowledge", {
+  id: int("id").autoincrement().primaryKey(),
+  genePathway: varchar("genePathway", { length: 256 }),
+  mechanism: varchar("mechanism", { length: 256 }).notNull(),
+  content: text("content").notNull(),
+  plainLanguageSummary: text("plainLanguageSummary"),
+  lifestyleFactors: json("lifestyleFactors").$type<string[]>(),
+  ancestralConnection: text("ancestralConnection"),
+  researchSources: json("researchSources").$type<string[]>(),
+  keywords: json("keywords").$type<string[]>(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type EpigeneticsKnowledge = typeof epigeneticsKnowledge.$inferSelect;
+
+/**
+ * Research papers ingested from arXiv, PubMed, and other academic sources
+ */
+export const researchPapers = mysqlTable("research_papers", {
+  id: int("id").autoincrement().primaryKey(),
+  title: varchar("title", { length: 512 }).notNull(),
+  authors: json("authors").$type<string[]>(),
+  source: varchar("source", { length: 256 }).notNull(),
+  domain: mysqlEnum("domain", ["quantum_physics", "ifa_studies", "yoruba_language", "alternative_medicine", "epigenetics", "medical_education", "psychology", "philosophy", "other"]).notNull(),
+  abstract: text("abstract"),
+  url: text("url"),
+  doi: varchar("doi", { length: 256 }),
+  credibilityScore: float("credibilityScore").default(0.5).notNull(),
+  citationCount: int("citationCount").default(0).notNull(),
+  keywords: json("keywords").$type<string[]>(),
+  publishedAt: timestamp("publishedAt"),
+  ingestedAt: timestamp("ingestedAt").defaultNow().notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type ResearchPaper = typeof researchPapers.$inferSelect;
+
+/**
+ * User learning profiles — personalised depth and language preferences
+ */
+export const userLearningProfiles = mysqlTable("user_learning_profiles", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().unique(),
+  userOpenId: varchar("userOpenId", { length: 64 }).notNull().unique(),
+  learningDepth: mysqlEnum("learningDepth", ["introductory", "intermediate", "advanced"]).default("intermediate").notNull(),
+  languagePreference: mysqlEnum("languagePreference", ["english", "yoruba", "both"]).default("english").notNull(),
+  domainInterests: json("domainInterests").$type<string[]>(),
+  totalSessions: int("totalSessions").default(0).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type UserLearningProfile = typeof userLearningProfiles.$inferSelect;

@@ -489,6 +489,58 @@ export const appRouter = router({
       }),
   }),
 
+  quantum: router({
+    list: protectedProcedure
+      .input(z.object({ difficulty: z.enum(["introductory", "intermediate", "advanced", "all"]).default("all"), limit: z.number().default(20) }))
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) return [];
+        const { quantumKnowledge } = await import("../drizzle/schema");
+        const { eq } = await import("drizzle-orm");
+        if (input.difficulty === "all") {
+          return db.select().from(quantumKnowledge).limit(input.limit);
+        }
+        return db.select().from(quantumKnowledge).where(eq(quantumKnowledge.difficultyLevel, input.difficulty)).limit(input.limit);
+      }),
+
+    get: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) return null;
+        const { quantumKnowledge } = await import("../drizzle/schema");
+        const { eq } = await import("drizzle-orm");
+        const rows = await db.select().from(quantumKnowledge).where(eq(quantumKnowledge.id, input.id)).limit(1);
+        return rows[0] ?? null;
+      }),
+  }),
+
+  psychology: router({
+    list: protectedProcedure
+      .input(z.object({ evidenceLevel: z.string().optional(), limit: z.number().default(20) }))
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) return [];
+        const { psychologyKnowledge } = await import("../drizzle/schema");
+        const { eq } = await import("drizzle-orm");
+        if (input.evidenceLevel) {
+          return db.select().from(psychologyKnowledge).where(eq(psychologyKnowledge.evidenceLevel, input.evidenceLevel as "established" | "emerging" | "speculative")).limit(input.limit);
+        }
+        return db.select().from(psychologyKnowledge).limit(input.limit);
+      }),
+  }),
+
+  epigenetics: router({
+    list: protectedProcedure
+      .input(z.object({ limit: z.number().default(20) }))
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) return [];
+        const { epigeneticsKnowledge } = await import("../drizzle/schema");
+        return db.select().from(epigeneticsKnowledge).limit(input.limit);
+      }),
+  }),
+
   admin: router({
     getSessions: adminProcedure
       .input(z.object({ limit: z.number().default(20) }))

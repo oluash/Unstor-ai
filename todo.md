@@ -190,3 +190,81 @@
 - [x] Process each feed into knowledge nodes (chunked, summarised, topic-tagged) — 710 nodes created
 - [x] Verify knowledge base growth in database — 15 feeds + 710 nodes + 256 Odù + 13 medicine = 994 total records
 - [x] Confirm Unstor can reference ingested texts in chat responses — RAG engine queries unstor_knowledge_nodes on every chat
+
+## Unstor Mobile App (iOS & Android)
+
+### Architecture
+- [ ] Expo SDK 51 + React Native project scaffolded at /home/ubuntu/unstor-mobile
+- [ ] React Navigation v6 (Stack + Bottom Tabs)
+- [ ] Expo SecureStore for auth token storage
+- [ ] NativeWind (Tailwind for React Native) for styling
+- [ ] Dark theme matching the web app aesthetic
+
+### Screens
+- [ ] Splash / Onboarding screen
+- [ ] Login screen (OAuth via in-app browser)
+- [ ] Home / Dashboard screen (knowledge stats, countdown)
+- [ ] Chat screen (full conversation with Unstor)
+- [ ] Ifá Explorer screen (browse Odù, decode for situation)
+- [ ] Feed screen (submit URLs, text, books)
+- [ ] Settings screen (profile, logout)
+
+### API Integration
+- [ ] REST client pointing to https://unstorai-wtjdqczu.manus.space/api
+- [ ] Auth token management
+- [ ] Chat endpoint integration
+- [ ] Ifá decode endpoint integration
+- [ ] Feed submission endpoint integration
+- [ ] Knowledge nodes endpoint integration
+
+### Build & Distribution
+- [ ] app.json configured (bundle ID, version, permissions)
+- [ ] App icons generated
+- [ ] Splash screen configured
+- [ ] eas.json configured for EAS Build
+- [ ] Complete submission guide written (both stores)
+
+## Technical Specification Update (OKComputer Spec)
+
+### System Prompt Expansion
+- [x] Add Quantum Physics domain: basic to advanced QM, quantum consciousness, wave-function, entanglement, quantum biology
+- [x] Add Psychology & Behavioural Science domain: CBT, mindfulness, behavioural pattern recognition, emotional intelligence, trauma-informed
+- [x] Add Epigenetics & Systems Biology domain: gene expression, nutritional epigenetics, intergenerational trauma, lifestyle-genetic interaction
+- [x] Add Ayurvedic medicine to multi-layer medical knowledge
+- [x] Add Yoruba NLP rules: tone marks, dialectal variations (Oyo, Ekiti, Ijesha), proverbs, seamless Yoruba/English code-switching
+- [x] Expand multi-layer medical architecture in system prompt: Pharmaceutical → Traditional → Integrative → Safety
+- [x] Add personalized depth rule: adjust response depth based on user learning level (introductory/intermediate/advanced)
+- [x] Add source citation rule: cite arXiv, PubMed, academic sources when making factual claims
+- [x] Add confidence acknowledgement rule: acknowledge limits of knowledge and uncertainty
+
+### Database Schema
+- [x] Add quantum_knowledge table (topic, subtopic, content, equations, sources, difficulty_level)
+- [x] Add psychology_knowledge table (framework, technique, content, evidence_level, sources)
+- [x] Add epigenetics_knowledge table (gene_pathway, mechanism, content, research_sources)
+- [x] Add research_papers table (title, authors, source, domain, abstract, url, published_at, credibility_score)
+- [x] Add user_learning_profiles table (user_id, learning_depth, language_preference, domain_interests)
+- [x] Run migration SQL for all new tables — 5 new tables created
+
+### Autonomous Learning Agent
+- [ ] Expand web_crawl_queue with domain field and credibility_score column
+- [ ] Add 8 research domains to crawl agent: quantum_physics, ifa_studies, yoruba_language, alternative_medicine, epigenetics, medical_education, psychology, philosophy
+- [ ] Add credibility scoring logic: source authority, citation count, publication date, author credentials
+- [ ] Add arXiv API integration for quantum physics papers (daily)
+- [ ] Add PubMed API integration for medical/epigenetics research (daily)
+- [ ] Add scheduled crawl jobs per domain frequency
+
+### New tRPC Procedures
+- [ ] quantum.search(query) — search quantum knowledge base
+- [ ] quantum.getByTopic(topic) — get quantum concepts by topic
+- [ ] psychology.search(query) — search psychology/CBT knowledge
+- [ ] epigenetics.search(query) — search epigenetics knowledge
+- [ ] research.getLatest(domain) — get latest ingested research papers
+- [ ] research.search(query) — search across all research papers
+- [ ] user.updateLearningProfile(prefs) — update learning depth and language preference
+
+### New Frontend Pages
+- [x] Quantum Explorer page (/quantum) — browse quantum physics knowledge, quantum-Ifá bridge
+- [x] Psychology & Epigenetics page (/psychology) — psychology, CBT, epigenetics, ancestral connection sections
+- [ ] Research Digest page (/research) — deferred to future enhancement (tables exist, UI pending)
+- [x] Update navigation: sidebar now has 9 items including Quantum Reality and Psychology & Epigenetics
+- [ ] Update Home.tsx to reflect all 8 knowledge domains — deferred to future enhancement

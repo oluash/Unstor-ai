@@ -21,15 +21,22 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, PanelLeft, Users } from "lucide-react";
+import { LayoutDashboard, LogOut, PanelLeft, MessageCircle, BookOpen, Rss, FlaskConical, Brain, Atom, Shield } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
 import { Button } from "./ui/button";
 
 const menuItems = [
-  { icon: LayoutDashboard, label: "Page 1", path: "/" },
-  { icon: Users, label: "Page 2", path: "/some-path" },
+  { icon: LayoutDashboard, label: "Dashboard", path: "/" },
+  { icon: MessageCircle, label: "Chat with Unstor", path: "/chat" },
+  { icon: MessageCircle, label: "Owner Chat", path: "/owner-chat" },
+  { icon: BookOpen, label: "Ifá Explorer", path: "/ifa" },
+  { icon: Atom, label: "Quantum Reality", path: "/quantum" },
+  { icon: Brain, label: "Psychology & Epigenetics", path: "/psychology" },
+  { icon: Rss, label: "Feed Manager", path: "/feed", adminOnly: true },
+  { icon: FlaskConical, label: "Knowledge Base", path: "/knowledge" },
+  { icon: Shield, label: "Admin", path: "/admin", adminOnly: true },
 ];
 
 const SIDEBAR_WIDTH_KEY = "sidebar-width";
@@ -170,8 +177,8 @@ function DashboardLayoutContent({
               </button>
               {!isCollapsed ? (
                 <div className="flex items-center gap-2 min-w-0">
-                  <span className="font-semibold tracking-tight truncate">
-                    Navigation
+                  <span className="font-semibold tracking-tight truncate text-violet-300">
+                    Unstor AI
                   </span>
                 </div>
               ) : null}
@@ -180,7 +187,7 @@ function DashboardLayoutContent({
 
           <SidebarContent className="gap-0">
             <SidebarMenu className="px-2 py-1">
-              {menuItems.map(item => {
+              {menuItems.filter(item => !('adminOnly' in item && item.adminOnly) || user?.role === 'admin').map(item => {
                 const isActive = location === item.path;
                 return (
                   <SidebarMenuItem key={item.path}>

@@ -12,6 +12,8 @@ import OwnerInspection from "./pages/OwnerInspection";
 import FeedManager from "./pages/FeedManager";
 import IfaExplorer from "./pages/IfaExplorer";
 import OwnerChat from "./pages/OwnerChat";
+import QuantumExplorer from "./pages/QuantumExplorer";
+import PsychologyEpigenetics from "./pages/PsychologyEpigenetics";
 
 function Router() {
   return (
@@ -24,6 +26,8 @@ function Router() {
       <Route path="/feed" component={FeedManager} />
       <Route path="/ifa" component={IfaExplorer} />
       <Route path="/owner-chat" component={OwnerChat} />
+      <Route path="/quantum" component={QuantumExplorer} />
+      <Route path="/psychology" component={PsychologyEpigenetics} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>
