@@ -187,9 +187,9 @@ export default function Chat() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="h-[100dvh] bg-background flex flex-col overflow-hidden">
       {/* Header */}
-      <header className="border-b border-border/50 bg-background/80 backdrop-blur-sm sticky top-0 z-50">
+      <header className="border-b border-border/50 bg-background/80 backdrop-blur-sm sticky top-0 z-50 flex-shrink-0">
         <div className="container flex items-center justify-between h-14">
           <div className="flex items-center gap-3">
             <Link href="/">
@@ -213,8 +213,8 @@ export default function Chat() {
       </header>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto custom-scrollbar">
-        <div className="container max-w-3xl py-8 space-y-6">
+      <div className="flex-1 overflow-y-auto custom-scrollbar min-h-0">
+        <div className="container max-w-3xl py-5 sm:py-8 space-y-5 sm:space-y-6">
           {/* Welcome state */}
           {messages.length === 0 && (
             <div className="text-center py-16 space-y-4">
@@ -270,7 +270,7 @@ export default function Chat() {
 
               {/* Bubble */}
               <div
-                className={`max-w-[80%] rounded-2xl px-4 py-3 ${
+                className={`max-w-[88%] sm:max-w-[80%] rounded-2xl px-3 sm:px-4 py-2.5 sm:py-3 ${
                   message.role === "user"
                     ? "bg-primary text-primary-foreground rounded-tr-sm"
                     : "bg-card border border-border text-card-foreground rounded-tl-sm"
@@ -311,16 +311,16 @@ export default function Chat() {
       </div>
 
       {/* Input */}
-      <div className="border-t border-border/50 bg-background/80 backdrop-blur-sm">
-        <div className="container max-w-3xl py-4">
-          <div className="flex gap-3 items-end">
+      <div className="border-t border-border/50 bg-background/80 backdrop-blur-sm flex-shrink-0">
+        <div className="container max-w-3xl py-3 sm:py-4">
+          <div className="flex gap-2 sm:gap-3 items-end">
             {/* Voice input button */}
             <Button
               onClick={startVoiceInput}
               size="icon"
               variant="outline"
               title={isRecording ? "Stop recording" : "Voice input"}
-              className={`w-[52px] h-[52px] rounded-xl flex-shrink-0 transition-all ${
+              className={`w-11 h-11 sm:w-[52px] sm:h-[52px] rounded-xl flex-shrink-0 transition-all ${
                 isRecording
                   ? "border-red-500/60 bg-red-500/10 text-red-400 hover:bg-red-500/20 animate-pulse"
                   : "border-border text-muted-foreground hover:text-foreground hover:border-primary/40"
@@ -336,7 +336,7 @@ export default function Chat() {
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder={isRecording ? "Listening..." : "Message Unstor..."}
-                className="resize-none min-h-[52px] max-h-[200px] bg-card border-border focus:border-primary/50 text-foreground placeholder:text-muted-foreground rounded-xl pr-4 py-3 custom-scrollbar"
+                className="resize-none min-h-[44px] sm:min-h-[52px] max-h-[120px] sm:max-h-[200px] bg-card border-border focus:border-primary/50 text-foreground placeholder:text-muted-foreground rounded-xl pr-3 sm:pr-4 py-2.5 sm:py-3 text-sm custom-scrollbar"
                 rows={1}
                 disabled={isLoading}
               />
@@ -345,7 +345,7 @@ export default function Chat() {
               onClick={handleSend}
               disabled={!input.trim() || isLoading}
               size="icon"
-              className="w-[52px] h-[52px] rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground flex-shrink-0"
+              className="w-11 h-11 sm:w-[52px] sm:h-[52px] rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground flex-shrink-0"
             >
               {isLoading ? (
                 <Loader2 className="w-4 h-4 animate-spin" />

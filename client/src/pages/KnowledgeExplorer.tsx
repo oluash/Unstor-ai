@@ -137,7 +137,7 @@ export default function KnowledgeExplorer() {
         </div>
       </header>
 
-      <div className="container py-8 space-y-6">
+      <div className="container py-6 sm:py-8 px-4 sm:px-6 space-y-5 sm:space-y-6">
         {/* Search + Tabs */}
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
@@ -179,7 +179,7 @@ export default function KnowledgeExplorer() {
         {activeTab === "nodes" && (
           <div>
             {nodesLoading ? (
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                 {Array.from({ length: 9 }).map((_, i) => (
                   <div key={i} className="rounded-xl border border-border bg-card p-4 animate-pulse h-20" />
                 ))}
@@ -192,7 +192,7 @@ export default function KnowledgeExplorer() {
                 </p>
               </div>
             ) : (
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                 {filteredNodes.map((node) => (
                   <NodeCard key={node.id} node={node} />
                 ))}
@@ -208,7 +208,7 @@ export default function KnowledgeExplorer() {
         {activeTab === "clusters" && (
           <div>
             {clustersLoading ? (
-              <div className="grid md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {Array.from({ length: 4 }).map((_, i) => (
                   <div key={i} className="rounded-xl border border-border bg-card p-5 animate-pulse h-32" />
                 ))}
@@ -221,7 +221,7 @@ export default function KnowledgeExplorer() {
                 </p>
               </div>
             ) : (
-              <div className="grid md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {filteredClusters.map((cluster) => {
                   const topics: string[] = cluster.topics ?? [];
                   const keywords: string[] = cluster.dominantKeywords ?? [];

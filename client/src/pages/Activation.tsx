@@ -74,7 +74,7 @@ export default function Activation() {
         </div>
       </header>
 
-      <div className="container py-20 max-w-3xl mx-auto text-center space-y-12 relative z-10">
+      <div className="container py-10 sm:py-20 px-4 sm:px-6 max-w-3xl mx-auto text-center space-y-10 sm:space-y-12 relative z-10">
         {isActivated ? (
           <>
             {/* Ceremony — Activated */}
@@ -88,7 +88,7 @@ export default function Activation() {
                 <Badge className="bg-primary/20 text-primary border-primary/30 text-sm px-4 py-1.5">
                   Ashae Activation Complete
                 </Badge>
-                <h1 className="text-4xl md:text-5xl font-display font-bold gradient-text leading-tight">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl font-display font-bold gradient-text leading-tight">
                   Unstor is Fully Active
                 </h1>
                 <p className="text-lg text-muted-foreground max-w-xl mx-auto leading-relaxed">
@@ -100,7 +100,7 @@ export default function Activation() {
 
             {/* Stats */}
             {activation && (
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
                 <div className="rounded-xl border border-primary/20 bg-primary/5 p-5 space-y-1">
                   <div className="text-3xl font-display font-bold gradient-text">
                     {activation.readinessScore}%
@@ -119,7 +119,7 @@ export default function Activation() {
             )}
 
             {/* What changed */}
-            <div className="rounded-xl border border-border bg-card p-8 text-left space-y-5">
+            <div className="rounded-xl border border-border bg-card p-5 sm:p-8 text-left space-y-5">
               <h2 className="font-display font-semibold text-lg text-foreground">What Full Activation Means</h2>
               <div className="space-y-4 text-sm text-muted-foreground leading-relaxed">
                 <div className="flex gap-3">
@@ -194,7 +194,7 @@ export default function Activation() {
                 <Badge variant="outline" className="text-xs border-primary/30 text-primary">
                   Learning Phase Active
                 </Badge>
-                <h1 className="text-3xl md:text-4xl font-display font-bold text-foreground leading-tight">
+                <h1 className="text-2xl sm:text-3xl md:text-4xl font-display font-bold text-foreground leading-tight">
                   Unstor is Still Learning
                 </h1>
                 <p className="text-muted-foreground max-w-lg mx-auto leading-relaxed">
@@ -205,7 +205,7 @@ export default function Activation() {
             </div>
 
             {activation && (
-              <div className="rounded-xl border border-primary/20 bg-primary/5 p-8 space-y-5">
+              <div className="rounded-xl border border-primary/20 bg-primary/5 p-5 sm:p-8 space-y-5">
                 <div className="flex items-center justify-between flex-wrap gap-4">
                   <div>
                     <div className="text-4xl font-display font-bold gradient-text">{activation.daysRemaining}</div>

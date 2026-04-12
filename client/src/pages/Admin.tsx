@@ -117,39 +117,40 @@ export default function Admin() {
             </div>
             <Badge variant="outline" className="text-xs border-primary/30 text-primary">Owner</Badge>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
             <Button
               variant="outline"
               size="sm"
-              className="gap-2 text-xs"
+              className="gap-1.5 text-xs px-2 sm:px-3"
               onClick={() => checkMilestones.mutate()}
               disabled={checkMilestones.isPending}
-              title="Check and notify owner of learning milestones"
+              title="Check milestones"
             >
               <Bell className={`w-3.5 h-3.5 ${checkMilestones.isPending ? "animate-pulse" : ""}`} />
-              Milestones
+              <span className="hidden sm:inline">Milestones</span>
             </Button>
             <Button
               variant="outline"
               size="sm"
-              className="gap-2 text-xs"
+              className="gap-1.5 text-xs px-2 sm:px-3"
               onClick={() => triggerSnapshot.mutate()}
               disabled={triggerSnapshot.isPending}
+              title="Snapshot"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${triggerSnapshot.isPending ? "animate-spin" : ""}`} />
-              Snapshot
+              <span className="hidden sm:inline">Snapshot</span>
             </Button>
             <Link href="/inspect">
-              <Button size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground gap-2 text-xs">
+              <Button size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground gap-1.5 text-xs px-2 sm:px-3">
                 <Activity className="w-3.5 h-3.5" />
-                Inspect
+                <span className="hidden sm:inline">Inspect</span>
               </Button>
             </Link>
             {activation && activation.daysRemaining <= 0 && (
               <Link href="/activation">
-                <Button size="sm" className="bg-amber-500 hover:bg-amber-600 text-white gap-2 text-xs animate-pulse">
+                <Button size="sm" className="bg-amber-500 hover:bg-amber-600 text-white gap-1.5 text-xs px-2 sm:px-3 animate-pulse">
                   <Sparkles className="w-3.5 h-3.5" />
-                  Ceremony
+                  <span className="hidden sm:inline">Ceremony</span>
                 </Button>
               </Link>
             )}
@@ -157,7 +158,7 @@ export default function Admin() {
         </div>
       </header>
 
-      <div className="container py-8 space-y-8">
+      <div className="container py-6 sm:py-8 space-y-6 sm:space-y-8">
         {/* Activation Status */}
         {activation && (
           <div className="rounded-xl border border-primary/20 bg-primary/5 p-5">

@@ -23,7 +23,7 @@ export default function PsychologyEpigenetics() {
 
   return (
     <DashboardLayout>
-      <div className="p-6 max-w-5xl mx-auto space-y-6">
+      <div className="px-4 sm:px-6 py-6 max-w-5xl mx-auto space-y-6">
         {/* Header */}
         <div className="space-y-1">
           <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2">

@@ -81,8 +81,8 @@ export default function Research() {
     <div className="min-h-screen bg-[#0a0a0f] text-white">
       {/* Header */}
       <div className="border-b border-white/10 bg-[#0d0d14]">
-        <div className="max-w-6xl mx-auto px-6 py-8">
-          <div className="flex items-start justify-between">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
             <div>
               <div className="flex items-center gap-3 mb-2">
                 <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-blue-500 flex items-center justify-center text-sm">
@@ -120,36 +120,38 @@ export default function Research() {
           </div>
 
           {/* Search */}
-          <div className="mt-6 flex gap-3">
+          <div className="mt-5 flex flex-col sm:flex-row gap-2 sm:gap-3">
             <Input
-              placeholder="Search papers by title, abstract, or domain..."
+              placeholder="Search papers..."
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
               onKeyDown={e => e.key === "Enter" && setActiveSearch(searchQuery)}
-              className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 max-w-lg"
+              className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 flex-1"
             />
-            <Button
-              onClick={() => setActiveSearch(searchQuery)}
-              className="bg-blue-600 hover:bg-blue-700 text-white"
-            >
-              Search
-            </Button>
-            {activeSearch && (
+            <div className="flex gap-2">
               <Button
-                variant="ghost"
-                onClick={() => { setActiveSearch(""); setSearchQuery(""); }}
-                className="text-gray-400 hover:text-white"
+                onClick={() => setActiveSearch(searchQuery)}
+                className="bg-blue-600 hover:bg-blue-700 text-white flex-1 sm:flex-none"
               >
-                Clear
+                Search
               </Button>
-            )}
+              {activeSearch && (
+                <Button
+                  variant="ghost"
+                  onClick={() => { setActiveSearch(""); setSearchQuery(""); }}
+                  className="text-gray-400 hover:text-white"
+                >
+                  Clear
+                </Button>
+              )}
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-6 py-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         <Tabs defaultValue="all" onValueChange={v => setSelectedDomain(v === "all" ? undefined : v)}>
-          <TabsList className="bg-white/5 border border-white/10 flex-wrap h-auto gap-1 p-1 mb-6">
+          <TabsList className="bg-white/5 border border-white/10 flex-wrap h-auto gap-1 p-1 mb-6 w-full">
             <TabsTrigger value="all" className="text-xs data-[state=active]:bg-white/10">All</TabsTrigger>
             {DOMAINS.map(d => (
               <TabsTrigger key={d} value={d} className="text-xs data-[state=active]:bg-white/10">
@@ -179,7 +181,7 @@ export default function Research() {
                 {displayPapers.map((paper: any) => (
                   <Card key={paper.id} className="bg-white/3 border-white/10 hover:border-white/20 transition-colors">
                     <CardContent className="p-5">
-                      <div className="flex items-start justify-between gap-4">
+                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-2 flex-wrap">
                             <span className={`text-xs px-2 py-0.5 rounded-full border ${SOURCE_COLORS[paper.source] ?? "bg-gray-500/20 text-gray-300 border-gray-500/30"}`}>

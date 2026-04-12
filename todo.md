@@ -324,3 +324,18 @@
 - [x] Reduce quantum/everything language — keep depth, remove exaggeration
 - [x] Reposition away from medical framing — reflection + support + knowledge only
 - [x] Update Chat page welcome/suggestion prompts to match new session starters
+
+## Mobile Responsiveness
+
+- [x] Audit all pages for mobile layout issues
+- [x] Mobile hamburger menu in top nav (Home page)
+- [x] Bottom navigation bar for mobile — Home.tsx mobile drawer nav covers all key routes
+- [x] Home.tsx: hero, features, sections all mobile-responsive
+- [x] Chat.tsx: 100dvh height, flex layout, min-h-0 scroll container, voice/export buttons accessible
+- [x] Research.tsx: stacked header, full-width tabs, stacked paper cards on mobile
+- [x] KnowledgeExplorer.tsx: responsive padding, single-column grids on mobile
+- [x] DashboardLayout.tsx: already uses shadcn Sidebar with built-in mobile trigger (no changes needed)
+- [x] Admin.tsx: icon-only action buttons on mobile, responsive padding
+- [x] Activation.tsx: responsive padding, single-column stats grid, responsive font sizes
+- [x] Fix overflow/horizontal scroll issues — responsive padding applied to all 9 pages
+- [x] Touch targets — shadcn Button size=sm is 36px; key chat/voice/export buttons use size=icon (40px+)

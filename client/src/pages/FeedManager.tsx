@@ -123,7 +123,7 @@ export default function FeedManager() {
     <div className="min-h-screen bg-[#0a0a0f]">
       {/* Header */}
       <div className="border-b border-indigo-500/10 bg-[#0d0d14]">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Link href="/" className="text-slate-400 hover:text-white text-sm">← Back</Link>
             <span className="text-slate-600">/</span>
@@ -138,7 +138,7 @@ export default function FeedManager() {
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-6 py-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {/* Page Title */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-white mb-2">

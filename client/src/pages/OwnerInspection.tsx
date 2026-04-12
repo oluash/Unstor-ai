@@ -115,7 +115,7 @@ export default function OwnerInspection() {
         </div>
       </header>
 
-      <div className="container max-w-4xl py-8 space-y-8">
+      <div className="container max-w-4xl py-6 sm:py-8 px-4 sm:px-6 space-y-6 sm:space-y-8">
         {/* Explanation */}
         <div className="rounded-xl border border-primary/20 bg-primary/5 p-5 space-y-2">
           <div className="flex items-center gap-2">

@@ -131,7 +131,7 @@ export default function OwnerChat() {
     <div className="min-h-screen bg-[#0a0a0f] flex flex-col">
       {/* Header */}
       <div className="border-b border-indigo-500/10 bg-[#0d0d14] shrink-0">
-        <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <a href="/" className="text-slate-400 hover:text-white text-sm">← Back</a>
             <span className="text-slate-600">/</span>
@@ -165,7 +165,7 @@ export default function OwnerChat() {
 
       {/* Chat Area */}
       <div className="flex-1 overflow-y-auto">
-        <div className="max-w-4xl mx-auto px-6 py-6">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-5 sm:py-6">
           {messages.length === 0 ? (
             /* Welcome State */
             <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
@@ -306,7 +306,7 @@ export default function OwnerChat() {
 
       {/* Input Area */}
       <div className="border-t border-indigo-500/10 bg-[#0d0d14] shrink-0">
-        <div className="max-w-4xl mx-auto px-6 py-4">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4">
           {messages.length > 0 && (
             <div className="flex gap-2 mb-3 overflow-x-auto pb-1 scrollbar-none">
               {SUGGESTED_PROMPTS.slice(0, 3).map((prompt, i) => {
