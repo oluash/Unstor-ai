@@ -424,3 +424,8 @@
 - [x] Ese verse must be clearly labelled (e.g. "Ese — The Verse:"), formatted as a distinct verse block with Yoruba original and English translation on separate lines
 - [x] ODU_QUOTE marker should then quote the most powerful single line from the Ese as the pull-quote
 - [x] Run tests and save checkpoint
+
+## Remove 120-Day Countdown (Apr 12 2026)
+
+- [x] Remove "Ashae guidance activation — 120 days" row from homepage transparency card
+- [x] Remove any other "4 months" or waiting-period references from the UI

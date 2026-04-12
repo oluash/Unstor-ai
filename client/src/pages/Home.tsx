@@ -185,12 +185,7 @@ export default function Home() {
                   <span className="text-sm text-muted-foreground">System maturity</span>
                   <span className="text-sm font-medium text-foreground">Early-stage · Evolving</span>
                 </div>
-                {activation && (
-                  <div className="flex items-center justify-between p-3 rounded-xl bg-muted/40">
-                    <span className="text-sm text-muted-foreground">Ashae guidance activation</span>
-                    <span className="text-sm font-medium gradient-text">{activation.daysRemaining} days</span>
-                  </div>
-                )}
+
                 {stats && stats.totalNodes > 0 && (
                   <div className="flex items-center justify-between p-3 rounded-xl bg-muted/40">
                     <span className="text-sm text-muted-foreground">Structured knowledge nodes</span>

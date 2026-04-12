@@ -167,10 +167,10 @@ export default function Admin() {
                 <span className="w-2.5 h-2.5 rounded-full bg-primary learning-pulse" />
                 <div>
                   <div className="font-display font-semibold text-foreground">
-                    {activation.phase === "LEARNING" ? "Active · Ashae Medical Activation Countdown" : "Fully Active Phase"}
+                    {activation.phase === "LEARNING" ? "Active · Ashae Guidance System" : "Fully Active Phase"}
                   </div>
                   <div className="text-xs text-muted-foreground mt-0.5">
-                    {activation.daysRemaining} days remaining · {activation.progressPercent}% complete
+                    {activation.progressPercent}% knowledge integration complete
                   </div>
                 </div>
               </div>
