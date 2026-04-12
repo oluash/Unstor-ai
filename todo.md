@@ -399,3 +399,11 @@
 - [x] Max 1 image per key section, no image for every response — only where visuals improve understanding
 - [x] Do not place images randomly or at top/bottom of whole answer
 - [x] Final UX: premium AI learning interface, mobile-first, clean, immersive
+
+## Owner Chat — Same UX Spec (Apr 12 2026)
+
+- [x] Apply full-width .ai-response-container to Owner Chat assistant messages
+- [x] Apply expand/collapse (ExpandableContent) to Owner Chat long responses
+- [x] Apply per-section AI image generation and placement with captions to Owner Chat
+- [x] Preserve Owner Chat metadata badges (knowledge used, confidence, timestamp)
+- [x] Run tests and save checkpoint
