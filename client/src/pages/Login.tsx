@@ -195,20 +195,7 @@ export default function Login() {
               )}
             </div>
 
-            {/* Divider + Manus login */}
-            <div className="mt-6 flex items-center gap-3">
-              <div className="flex-1 h-px bg-white/10" />
-              <span className="text-xs text-muted-foreground">or</span>
-              <div className="flex-1 h-px bg-white/10" />
-            </div>
-            <div className="mt-4 text-center">
-              <a
-                href={`${import.meta.env.VITE_OAUTH_PORTAL_URL}/app-auth?appId=${import.meta.env.VITE_APP_ID}&redirectUri=${encodeURIComponent(window.location.origin + '/api/oauth/callback')}&state=${btoa(window.location.origin + '/api/oauth/callback')}&type=signIn`}
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Sign in with Manus account →
-              </a>
-            </div>
+
           </CardContent>
         </Card>
 

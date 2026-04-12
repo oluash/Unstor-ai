@@ -58,10 +58,10 @@ async function runKnowledgeConsolidation(): Promise<void> {
     // Refresh confidence scores for nodes with low access count
     await db.execute(sql`
       UPDATE unstor_knowledge_nodes
-      SET confidence_score = LEAST(confidence_score + 0.01, 1.0),
-          updated_at = NOW()
-      WHERE access_count > 0
-        AND confidence_score < 1.0
+      SET confidenceScore = LEAST(confidenceScore + 0.01, 1.0),
+          updatedAt = NOW()
+      WHERE frequency > 0
+        AND confidenceScore < 1.0
       LIMIT 100
     `);
 

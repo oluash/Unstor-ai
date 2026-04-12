@@ -497,3 +497,13 @@
 - [x] Remove any hardcoded secrets or owner-specific data from codebase
 - [ ] Export to GitHub via Settings → GitHub panel (user action required)
 - [x] Test and save checkpoint
+
+## Remove Manus Dependency — Fully Standalone (Apr 12 2026)
+
+- [x] Remove "Sign in with Manus account" button from /login page
+- [x] Remove Manus OAuth callback route from server (kept in _core for platform compatibility, not user-facing)
+- [x] Remove VITE_OAUTH_PORTAL_URL and Manus OAuth env references from frontend const.ts
+- [x] Remove getLoginUrl() Manus OAuth redirect — now points to /login (email/password only)
+- [x] Remove any "Powered by Manus" or Manus branding from UI
+- [x] Keep email/password as the sole login method
+- [x] Test and save checkpoint
