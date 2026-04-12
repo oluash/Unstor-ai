@@ -18,6 +18,7 @@ import {
   getRecentSessions,
 } from "./db";
 import { kimiChat } from "./kimi";
+import { invokeLLM } from "./_core/llm";
 import { generateImage } from "./_core/imageGeneration";
 import { processFeed, crawlNextUrl, seedCrawlQueue } from "./feedIngestion";
 import { decodeOduForSituation, queryMedicineKnowledge, groundedOwnerChat, retrieveRelevantKnowledge } from "./ifaEngine";
@@ -80,12 +81,6 @@ export const appRouter = router({
       )
       .mutation(async ({ input, ctx }) => {
         const apiKey = process.env.KIMI_API_KEY;
-        if (!apiKey) {
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-            message: "Unstor intelligence engine is not configured.",
-          });
-        }
 
         const session = await getOrCreateSession(
           input.sessionKey,
@@ -143,7 +138,24 @@ export const appRouter = router({
           { role: "user" as const, content: input.message },
         ];
 
-        const kimiResponse = await kimiChat(kimiMessages, apiKey, knowledgeContext);
+        // Use built-in LLM if KIMI_API_KEY is not available
+        let kimiResponse: { content: string; tokenCount: number };
+        if (apiKey) {
+          kimiResponse = await kimiChat(kimiMessages, apiKey, knowledgeContext);
+        } else {
+          // Fall back to built-in Manus LLM with the same system prompt
+          const { UNSTOR_SYSTEM_PROMPT } = await import("./kimi");
+          const systemContent = knowledgeContext
+            ? `${UNSTOR_SYSTEM_PROMPT}\n\n---\nYOUR CURRENT KNOWLEDGE BASE (use this to ground your response — cite relevant entries):\n${knowledgeContext}`
+            : UNSTOR_SYSTEM_PROMPT;
+          const llmMessages: Array<{ role: "system" | "user" | "assistant"; content: string }> = [
+            { role: "system", content: systemContent },
+            ...kimiMessages,
+          ];
+          const llmResponse = await invokeLLM({ messages: llmMessages });
+          const content = llmResponse.choices[0]?.message?.content ?? "I am still learning. Please ask me again soon.";
+          kimiResponse = { content: typeof content === "string" ? content : JSON.stringify(content), tokenCount: 0 };
+        }
 
         const assistantPromptId = await insertPrompt({
           sessionId: session.id,

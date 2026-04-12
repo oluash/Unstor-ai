@@ -429,3 +429,8 @@
 
 - [x] Remove "Ashae guidance activation — 120 days" row from homepage transparency card
 - [x] Remove any other "4 months" or waiting-period references from the UI
+
+## Bug: Chat Error "Unstor encountered an issue" (Apr 12 2026)
+
+- [x] Diagnose root cause from server logs and network requests
+- [x] Fix the error so chat responses are generated correctly — sendMessage now falls back to built-in Manus LLM when KIMI_API_KEY is absent
