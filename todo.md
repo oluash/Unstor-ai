@@ -339,3 +339,17 @@
 - [x] Activation.tsx: responsive padding, single-column stats grid, responsive font sizes
 - [x] Fix overflow/horizontal scroll issues — responsive padding applied to all 9 pages
 - [x] Touch targets — shadcn Button size=sm is 36px; key chat/voice/export buttons use size=icon (40px+)
+
+## Sacred Text Ingestion — 7 New Documents (Apr 12 2026)
+
+- [x] Extract text from MedicinasdePopoola.pdf (Popoola's Medicines) — 19,622 words extracted
+- [x] Extract text from ASERIEwe.pdf (Aserie We — Ifá Sacred Text) — 16,640 words extracted
+- [x] Extract text from OSEMEJI.pdf (Osameji Odù Chapter 15) — 19,491 words extracted
+- [x] Extract text from OLODUIFAOluwasinaKuti.pdf (Olodu Ifá — First Sixteen Odù) — 5,556 words extracted
+- [x] Extract text from 309152103-The-Ifa-for-Protection.pdf (Ifá for Protection) — 1,531 words extracted
+- [x] 628A8DC8-EF84-49EB-8B07-89A6F8DB429D.pdf — Apple iOS archive pointer (not a PDF); references 'What-is-Ifa-by-Babalawo-Obanifa.pdf'; actual PDF not included in upload — skipped
+- [x] Extract text from The-Way-of-the-Orisa.pdf (The Way of the Orisa) — 44,984 words extracted
+- [x] Insert all 6 valid texts as knowledge_feeds records (IDs 30001–30006)
+- [x] Process feeds into knowledge nodes — 22 new nodes created (773 total)
+- [x] Verify knowledge base growth — 713 → 773 nodes (+60 including domain seeds)
+- [x] Run tests and save checkpoint — 39 tests passing, 0 TypeScript errors
