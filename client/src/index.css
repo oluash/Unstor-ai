@@ -218,7 +218,101 @@
   padding-bottom: 0.2rem;
 }
 
-/* Image inside chat bubble — full width, after pillar sections */
+/* ============================================================
+   AI Response Container — full-width, immersive, mobile-first
+   ============================================================ */
+.ai-response-container {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  background: var(--card);
+  border: 1px solid oklch(0.20 0.02 260);
+  color: var(--card-foreground);
+  padding: 14px 16px;
+}
+
+@media (max-width: 768px) {
+  .ai-response-container {
+    padding: 12px 12px;
+  }
+}
+
+/* ============================================================
+   Expand / Collapse
+   ============================================================ */
+.response-collapsed {
+  max-height: 200px;
+  overflow: hidden;
+  position: relative;
+  transition: max-height 0.3s ease;
+}
+
+.response-collapsed::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 50px;
+  background: linear-gradient(to bottom, transparent, oklch(0.11 0.015 260));
+  pointer-events: none;
+}
+
+.response-expanded {
+  max-height: none;
+  transition: max-height 0.3s ease;
+}
+
+.expand-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  color: oklch(0.65 0.22 280);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: opacity 0.15s;
+}
+
+.expand-toggle:hover {
+  opacity: 0.8;
+}
+
+/* ============================================================
+   AI Image block — placed after relevant section
+   ============================================================ */
+.ai-image-block {
+  width: 100%;
+  margin: 14px 0 18px 0;
+}
+
+.ai-image-block img {
+  width: 100%;
+  height: auto;
+  max-height: 280px;
+  object-fit: cover;
+  display: block;
+  border-radius: 0.75rem;
+  border: 1px solid oklch(0.22 0.02 260);
+}
+
+.image-caption {
+  margin-top: 6px;
+  font-size: 0.8rem;
+  color: oklch(0.55 0.01 260);
+  font-style: italic;
+  line-height: 1.4;
+}
+
+/* Pillar section wrapper */
+.pillar-section {
+  margin-bottom: 0.25rem;
+}
+
+/* Legacy chat-image kept for backward compat */
 .chat-image {
   width: 100%;
   max-height: 260px;
@@ -227,16 +321,6 @@
   margin: 0.5rem 0 0.75rem 0;
   border: 1px solid oklch(0.22 0.02 260);
   display: block;
-}
-
-/* Pillar section wrapper */
-.pillar-section {
-  margin-bottom: 0.25rem;
-}
-
-/* Image wrapper after each pillar */
-.pillar-image-wrap {
-  margin: 0.5rem 0 1rem 0;
 }
 
 @layer components {

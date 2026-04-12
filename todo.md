@@ -386,3 +386,16 @@
 - [x] Domain-aware image prompts: Pillar 1 → ifa_studies, Pillar 2 → quantum_physics, Pillar 3 → nature
 - [x] User messages remain compact right-aligned bubbles (max-w-[82%])
 - [x] Run tests and save checkpoint — 39 tests passing, 0 TypeScript errors
+
+## Response UX Spec — Full-Width + Expand/Collapse + Smart Images (Apr 12 2026)
+
+- [x] Full-width response card: width 100%, no narrow column, small internal padding only (12px mobile, 16px desktop)
+- [x] Expand/collapse for long responses: collapse at 200px height, fade gradient overlay, "Read more" / "Show less" toggle
+- [x] Smooth expand animation: max-height transition 0.3s ease
+- [x] Short responses remain fully visible (no collapse if content fits)
+- [x] Smart image placement: identify which paragraph/section benefits from a visual, place image immediately after that section
+- [x] Image caption rendered below each AI-generated image
+- [x] Image prompt logic: culturally respectful, educational, Afrocentric where appropriate, realistic/elegant style
+- [x] Max 1 image per key section, no image for every response — only where visuals improve understanding
+- [x] Do not place images randomly or at top/bottom of whole answer
+- [x] Final UX: premium AI learning interface, mobile-first, clean, immersive

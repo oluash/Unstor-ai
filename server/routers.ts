@@ -178,6 +178,7 @@ export const appRouter = router({
           topic: z.string().min(1).max(500),
           oduName: z.string().optional(),
           domain: z.string().optional(),
+          paragraphSnippet: z.string().max(400).optional(),
         })
       )
       .mutation(async ({ input }) => {
@@ -192,12 +193,19 @@ export const appRouter = router({
             ? "human mind, neural pathways, contemplative meditation, consciousness"
             : "nature, cosmic patterns, sacred wisdom, universal energy";
           const oduRef = input.oduName ? `Inspired by the If\u00e1 Od\u00f9 ${input.oduName}. ` : "";
-          const prompt = `Cinematic, photorealistic, dark atmospheric art: ${input.topic}. ${domainStyle}. ${oduRef}Deep indigo and violet tones, soft golden light, mystical and contemplative. No text, no words, no letters in the image.`;
+          const contextSnippet = input.paragraphSnippet
+            ? `Supporting this explanation: ${input.paragraphSnippet.slice(0, 300)}. `
+            : "";
+          const prompt = `Create a culturally respectful, educational, and visually clear image. ${contextSnippet}Topic: ${input.topic}. ${domainStyle}. ${oduRef}Style: realistic, elegant, symbolic where needed, non-cartoonish. Tone: calm, intelligent, spiritually respectful, Afrocentric where appropriate. Deep indigo and violet tones, soft golden light. No text, no words, no letters in the image.`;
           const result = await generateImage({ prompt });
-          return { url: result.url ?? null };
+          // Generate a short caption from the topic
+          const caption = input.topic.length > 80
+            ? input.topic.slice(0, 77) + "..."
+            : input.topic;
+          return { url: result.url ?? null, caption };
         } catch (err) {
           console.error("[ImageGen] Failed:", err);
-          return { url: null };
+          return { url: null, caption: null };
         }
       }),
   }),

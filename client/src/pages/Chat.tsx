@@ -1,36 +1,95 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "wouter";
-import { Brain, ArrowLeft, Loader2, User, Sparkles, Send, Mic, MicOff, Download, Volume2, VolumeX } from "lucide-react";
+import {
+  Brain, ArrowLeft, Loader2, User, Sparkles, Send,
+  Mic, MicOff, Download, Volume2, VolumeX, ChevronDown, ChevronUp,
+} from "lucide-react";
 import { Streamdown } from "streamdown";
 import { nanoid } from "nanoid";
 import { toast } from "sonner";
 
 const UNSTOR_AVATAR = "https://d2xsxph8kpxj0f.cloudfront.net/310519663246644329/WtjdqCZuUAjS52crCAfDKK/unstor-avatar-o6axhgpSuTHquWi5bcWcYG.webp";
 
-interface PillarImage {
-  pillarIndex: number; // 0 = after pillar 1, 1 = after pillar 2, 2 = after pillar 3
+// Height threshold (px) above which a response is considered "long"
+const COLLAPSE_THRESHOLD = 200;
+
+interface SectionImage {
+  sectionIndex: number;
   url: string;
+  caption: string | null;
+}
+
+interface ResponseSection {
+  heading: string;
+  body: string;
 }
 
 interface Message {
   role: "user" | "assistant";
   content: string;
   timestamp: Date;
-  pillarImages?: PillarImage[];
+  sectionImages?: SectionImage[];
 }
+
+// ─── Helpers ────────────────────────────────────────────────────────────────
+
+function extractTopic(content: string): string {
+  const pillar1Match = content.match(/PILLAR\s+1[^:]*:\s*([^\n]{10,80})/i);
+  if (pillar1Match) return pillar1Match[1].trim();
+  const firstSentence = content.replace(/[#*_>`]/g, "").split(/[.!?]/)[0]?.trim();
+  return firstSentence?.slice(0, 120) ?? content.slice(0, 120);
+}
+
+function extractOduName(content: string): string | undefined {
+  const match = content.match(
+    /\b(Ogbe|Oyeku|Iwori|Odi|Irosun|Owonrin|Obara|Okanran|Ogunda|Osa|Ika|Oturupon|Otura|Irete|Ose|Ofun)\s+\w+/i
+  );
+  return match?.[0];
+}
+
+/**
+ * Split a markdown response into sections by PILLAR headings.
+ * Falls back to a single section if no PILLAR headings are found.
+ */
+function splitIntoPillarSections(content: string): ResponseSection[] {
+  const pillarRegex = /(?=(?:#{1,3}\s*)?PILLAR\s+[123])/gi;
+  const parts = content.split(pillarRegex).filter(Boolean);
+  if (parts.length <= 1) return [{ heading: "", body: content }];
+  return parts.map((part) => {
+    const nl = part.indexOf("\n");
+    const heading = nl > -1 ? part.slice(0, nl).trim() : part.trim();
+    const body = nl > -1 ? part.slice(nl + 1).trim() : "";
+    return { heading, body };
+  });
+}
+
+/** Extract a short snippet from a section body for the image prompt */
+function sectionSnippet(section: ResponseSection): string {
+  const raw = (section.heading + " " + section.body).replace(/[#*_>`]/g, "").trim();
+  return raw.slice(0, 300);
+}
+
+/** Domain for image generation based on pillar index */
+function pillarDomain(idx: number): string {
+  if (idx === 0) return "ifa_studies";
+  if (idx === 1) return "quantum_physics";
+  return "nature";
+}
+
+// ─── Typing indicator ────────────────────────────────────────────────────────
 
 function TypingIndicator() {
   return (
     <div className="flex items-start gap-2">
-      <div className="w-7 h-7 rounded-lg border-0 flex items-center justify-center flex-shrink-0 overflow-hidden">
+      <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg overflow-hidden flex-shrink-0 mt-0.5">
         <img src={UNSTOR_AVATAR} alt="Unstor" className="w-full h-full object-cover" />
       </div>
-      <div className="bg-card border border-border rounded-2xl rounded-tl-sm px-4 py-3">
+      <div className="flex-1 ai-response-container rounded-2xl rounded-tl-sm">
         <div className="flex gap-1.5 items-center h-5">
           <div className="w-1.5 h-1.5 rounded-full bg-primary typing-dot" />
           <div className="w-1.5 h-1.5 rounded-full bg-primary typing-dot" />
@@ -41,7 +100,145 @@ function TypingIndicator() {
   );
 }
 
-// Extend Window type for SpeechRecognition
+// ─── Expand/collapse wrapper ─────────────────────────────────────────────────
+
+function ExpandableContent({ children }: { children: React.ReactNode }) {
+  const [expanded, setExpanded] = useState(false);
+  const [needsCollapse, setNeedsCollapse] = useState(false);
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = contentRef.current;
+    if (!el) return;
+    // Give the DOM time to paint before measuring
+    const id = requestAnimationFrame(() => {
+      if (el.scrollHeight > COLLAPSE_THRESHOLD + 20) {
+        setNeedsCollapse(true);
+      }
+    });
+    return () => cancelAnimationFrame(id);
+  }, [children]);
+
+  return (
+    <div>
+      <div
+        ref={contentRef}
+        className={needsCollapse && !expanded ? "response-collapsed" : "response-expanded"}
+      >
+        {children}
+      </div>
+      {needsCollapse && (
+        <button
+          onClick={() => setExpanded((v) => !v)}
+          className="expand-toggle"
+        >
+          {expanded ? (
+            <><ChevronUp className="w-3.5 h-3.5" /> Show less</>
+          ) : (
+            <><ChevronDown className="w-3.5 h-3.5" /> Read more</>
+          )}
+        </button>
+      )}
+    </div>
+  );
+}
+
+// ─── Single assistant message ─────────────────────────────────────────────────
+
+function AssistantMessage({
+  message,
+  index,
+  speakingIndex,
+  onSpeak,
+}: {
+  message: Message;
+  index: number;
+  speakingIndex: number | null;
+  onSpeak: (text: string, idx: number) => void;
+}) {
+  const sections = splitIntoPillarSections(message.content);
+  const hasPillars = sections.length > 1;
+
+  const renderSections = () =>
+    sections.map((section, sIdx) => {
+      const img = message.sectionImages?.find((i) => i.sectionIndex === sIdx);
+      return (
+        <div key={sIdx} className="pillar-section">
+          {section.heading && (
+            <Streamdown className="chat-prose">{section.heading}</Streamdown>
+          )}
+          {section.body && (
+            <Streamdown className="chat-prose">{section.body}</Streamdown>
+          )}
+          {img?.url && (
+            <div className="ai-image-block">
+              <img
+                src={img.url}
+                alt={img.caption ?? "AI-generated illustration"}
+                loading="lazy"
+              />
+              {img.caption && (
+                <p className="image-caption">{img.caption}</p>
+              )}
+            </div>
+          )}
+        </div>
+      );
+    });
+
+  const renderSingle = () => (
+    <>
+      <Streamdown className="chat-prose">{message.content}</Streamdown>
+      {message.sectionImages && message.sectionImages.length > 0 && message.sectionImages[0]?.url && (
+        <div className="ai-image-block">
+          <img
+            src={message.sectionImages[0].url}
+            alt={message.sectionImages[0].caption ?? "AI-generated illustration"}
+            loading="lazy"
+          />
+          {message.sectionImages[0].caption && (
+            <p className="image-caption">{message.sectionImages[0].caption}</p>
+          )}
+        </div>
+      )}
+    </>
+  );
+
+  return (
+    <div className="flex items-start gap-2">
+      {/* Avatar */}
+      <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg overflow-hidden flex-shrink-0 mt-0.5">
+        <img src={UNSTOR_AVATAR} alt="Unstor" className="w-full h-full object-cover" />
+      </div>
+
+      {/* Full-width response card */}
+      <div className="flex-1 min-w-0 ai-response-container rounded-2xl rounded-tl-sm">
+        <ExpandableContent>
+          {hasPillars ? renderSections() : renderSingle()}
+        </ExpandableContent>
+
+        {/* Footer: timestamp + TTS */}
+        <div className="flex items-center justify-between mt-2 pt-2 border-t border-border/30 gap-2">
+          <span className="text-xs text-muted-foreground">
+            {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+          </span>
+          <button
+            onClick={() => onSpeak(message.content, index)}
+            title={speakingIndex === index ? "Stop speaking" : "Listen to response"}
+            className="text-muted-foreground hover:text-primary transition-colors p-0.5"
+          >
+            {speakingIndex === index
+              ? <VolumeX className="w-3 h-3" />
+              : <Volume2 className="w-3 h-3" />}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── SpeechRecognition types ─────────────────────────────────────────────────
+
 interface ISpeechRecognition extends EventTarget {
   lang: string;
   interimResults: boolean;
@@ -60,137 +257,7 @@ declare global {
   }
 }
 
-/** Extract a short topic phrase from the first 120 chars of a response */
-function extractTopic(content: string): string {
-  const pillar1Match = content.match(/PILLAR\s+1[^:]*:\s*([^\n]{10,80})/i);
-  if (pillar1Match) return pillar1Match[1].trim();
-  const firstSentence = content.replace(/[#*_>`]/g, "").split(/[.!?]/)[0]?.trim();
-  return firstSentence?.slice(0, 120) ?? content.slice(0, 120);
-}
-
-/** Try to extract the Odù name from the response */
-function extractOduName(content: string): string | undefined {
-  const match = content.match(/\b(Ogbe|Oyeku|Iwori|Odi|Irosun|Owonrin|Obara|Okanran|Ogunda|Osa|Ika|Oturupon|Otura|Irete|Ose|Ofun)\s+\w+/i);
-  return match?.[0];
-}
-
-/**
- * Split a markdown response into sections by PILLAR headings.
- * Returns an array of { heading, body } objects.
- * If no PILLAR headings found, returns the whole content as one section.
- */
-function splitIntoPillarSections(content: string): Array<{ heading: string; body: string }> {
-  // Match PILLAR 1 / PILLAR 2 / PILLAR 3 headings (## or ### or plain)
-  const pillarRegex = /(?=(?:#{1,3}\s*)?PILLAR\s+[123])/gi;
-  const parts = content.split(pillarRegex).filter(Boolean);
-  if (parts.length <= 1) {
-    return [{ heading: "", body: content }];
-  }
-  return parts.map((part) => {
-    const firstNewline = part.indexOf("\n");
-    const heading = firstNewline > -1 ? part.slice(0, firstNewline).trim() : part.trim();
-    const body = firstNewline > -1 ? part.slice(firstNewline + 1).trim() : "";
-    return { heading, body };
-  });
-}
-
-/** Determine the domain for image generation based on pillar index */
-function pillarToDomain(pillarIndex: number): string {
-  if (pillarIndex === 0) return "ifa_studies";
-  if (pillarIndex === 1) return "quantum_physics";
-  return "nature";
-}
-
-/** Render a single assistant message with inline pillar images */
-function AssistantMessage({
-  message,
-  index,
-  speakingIndex,
-  onSpeak,
-}: {
-  message: Message;
-  index: number;
-  speakingIndex: number | null;
-  onSpeak: (text: string, index: number) => void;
-}) {
-  const sections = splitIntoPillarSections(message.content);
-  const hasPillars = sections.length > 1;
-
-  return (
-    <div className="flex items-start gap-2">
-      {/* Avatar */}
-      <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg border-0 flex items-center justify-center flex-shrink-0 overflow-hidden mt-0.5">
-        <img src={UNSTOR_AVATAR} alt="Unstor" className="w-full h-full object-cover" />
-      </div>
-
-      {/* Full-width bubble */}
-      <div className="min-w-0 flex-1 bg-card border border-border text-card-foreground rounded-2xl rounded-tl-sm overflow-hidden">
-        <div className="px-3 sm:px-4 pt-3 pb-2">
-          {hasPillars ? (
-            // Render each pillar section followed by its image
-            sections.map((section, sIdx) => {
-              const imageForSection = message.pillarImages?.find((img) => img.pillarIndex === sIdx);
-              return (
-                <div key={sIdx} className="pillar-section">
-                  {/* Pillar heading */}
-                  {section.heading && (
-                    <Streamdown className="chat-prose">{section.heading}</Streamdown>
-                  )}
-                  {/* Pillar body */}
-                  {section.body && (
-                    <Streamdown className="chat-prose">{section.body}</Streamdown>
-                  )}
-                  {/* Image after this pillar section */}
-                  {imageForSection?.url && (
-                    <div className="pillar-image-wrap">
-                      <img
-                        src={imageForSection.url}
-                        alt={`Illustration for ${section.heading || `section ${sIdx + 1}`}`}
-                        className="chat-image"
-                        loading="lazy"
-                      />
-                    </div>
-                  )}
-                </div>
-              );
-            })
-          ) : (
-            // No pillar structure — render whole content, image at end
-            <>
-              <Streamdown className="chat-prose">{message.content}</Streamdown>
-              {message.pillarImages && message.pillarImages.length > 0 && message.pillarImages[0]?.url && (
-                <div className="pillar-image-wrap">
-                  <img
-                    src={message.pillarImages[0].url}
-                    alt="Contextual illustration"
-                    className="chat-image"
-                    loading="lazy"
-                  />
-                </div>
-              )}
-            </>
-          )}
-
-          {/* Footer: timestamp + TTS */}
-          <div className="flex items-center justify-between mt-2 gap-2">
-            <span className="text-xs text-muted-foreground">
-              {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-            </span>
-            <button
-              onClick={() => onSpeak(message.content, index)}
-              title={speakingIndex === index ? "Stop speaking" : "Listen to response"}
-              className="text-muted-foreground hover:text-primary transition-colors p-0.5"
-            >
-              {speakingIndex === index
-                ? <VolumeX className="w-3 h-3" />
-                : <Volume2 className="w-3 h-3" />}
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
+// ─── Main Chat page ───────────────────────────────────────────────────────────
 
 export default function Chat() {
   const { user } = useAuth();
@@ -201,6 +268,8 @@ export default function Chat() {
   const [isRecording, setIsRecording] = useState(false);
   const [speakingIndex, setSpeakingIndex] = useState<number | null>(null);
   const recognitionRef = useRef<ISpeechRecognition | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const speakMessage = (text: string, index: number) => {
     if (!window.speechSynthesis) {
@@ -219,17 +288,15 @@ export default function Chat() {
     utterance.pitch = 1.0;
     utterance.volume = 1.0;
     const voices = window.speechSynthesis.getVoices();
-    const preferred = voices.find(v => v.lang.startsWith("en") && v.name.toLowerCase().includes("natural"))
-      ?? voices.find(v => v.lang.startsWith("en"));
+    const preferred =
+      voices.find((v) => v.lang.startsWith("en") && v.name.toLowerCase().includes("natural")) ??
+      voices.find((v) => v.lang.startsWith("en"));
     if (preferred) utterance.voice = preferred;
     utterance.onend = () => setSpeakingIndex(null);
     utterance.onerror = () => setSpeakingIndex(null);
     setSpeakingIndex(index);
     window.speechSynthesis.speak(utterance);
   };
-
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const startVoiceInput = () => {
     const SpeechRecognitionAPI = window.SpeechRecognition ?? window.webkitSpeechRecognition;
@@ -267,8 +334,9 @@ export default function Chat() {
       toast.error("No messages to export.");
       return;
     }
-    const lines = messages.map(m =>
-      `[${m.timestamp.toLocaleTimeString()}] ${m.role === "user" ? "You" : "Unstor"}: ${m.content}`
+    const lines = messages.map(
+      (m) =>
+        `[${m.timestamp.toLocaleTimeString()}] ${m.role === "user" ? "You" : "Unstor"}: ${m.content}`
     );
     const blob = new Blob([lines.join("\n\n")], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
@@ -280,59 +348,52 @@ export default function Chat() {
     toast.success("Conversation exported.");
   };
 
-  // Dynamic prompt suggestions from the library
   const { data: dynamicSuggestions } = trpc.prompts.getRandom.useQuery({ count: 6 });
-
-  // Image generation mutation
   const generateContextImage = trpc.chat.generateContextImage.useMutation();
 
   const sendMessage = trpc.chat.sendMessage.useMutation({
     onSuccess: async (data) => {
-      // Add the message without images first
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: data.response, timestamp: new Date(), pillarImages: [] },
+        { role: "assistant", content: data.response, timestamp: new Date(), sectionImages: [] },
       ]);
       setIsLoading(false);
 
-      // Generate images for each pillar section in parallel
       const sections = splitIntoPillarSections(data.response);
       const oduName = extractOduName(data.response);
-      const topic = extractTopic(data.response);
+      const globalTopic = extractTopic(data.response);
 
-      // Generate one image per pillar (up to 3), in background
-      const imagePromises = sections.slice(0, 3).map(async (section, sIdx) => {
-        try {
-          const sectionTopic = section.heading
-            ? section.heading.replace(/[#*_]/g, "").trim()
-            : topic;
-          const domain = pillarToDomain(sIdx);
-          const result = await generateContextImage.mutateAsync({
-            topic: sectionTopic || topic,
+      // Generate one image per pillar section in parallel
+      sections.slice(0, 3).forEach((section, sIdx) => {
+        const sectionTopic = section.heading
+          ? section.heading.replace(/[#*_]/g, "").trim()
+          : globalTopic;
+        const snippet = sectionSnippet(section);
+        const domain = pillarDomain(sIdx);
+
+        generateContextImage
+          .mutateAsync({
+            topic: sectionTopic || globalTopic,
             oduName: sIdx === 0 ? oduName : undefined,
             domain,
+            paragraphSnippet: snippet,
+          })
+          .then((result) => {
+            if (!result.url) return;
+            setMessages((prev) => {
+              const lastIdx = prev.length - 1;
+              if (lastIdx < 0 || prev[lastIdx].role !== "assistant") return prev;
+              const updated = { ...prev[lastIdx] };
+              updated.sectionImages = [
+                ...(updated.sectionImages ?? []),
+                { sectionIndex: sIdx, url: result.url!, caption: result.caption ?? null },
+              ];
+              return [...prev.slice(0, lastIdx), updated];
+            });
+          })
+          .catch(() => {
+            // Silent — response still shows without image
           });
-          if (result.url) {
-            return { pillarIndex: sIdx, url: result.url } as PillarImage;
-          }
-        } catch {
-          // Silent failure — response still shows without image
-        }
-        return null;
-      });
-
-      // As each image resolves, update the last assistant message
-      imagePromises.forEach((promise) => {
-        promise.then((img) => {
-          if (!img) return;
-          setMessages((prev) => {
-            const lastIdx = prev.length - 1;
-            if (lastIdx < 0 || prev[lastIdx].role !== "assistant") return prev;
-            const updated = { ...prev[lastIdx] };
-            updated.pillarImages = [...(updated.pillarImages ?? []), img];
-            return [...prev.slice(0, lastIdx), updated];
-          });
-        });
       });
     },
     onError: () => {
@@ -348,12 +409,10 @@ export default function Chat() {
   const handleSend = () => {
     const trimmed = input.trim();
     if (!trimmed || isLoading) return;
-
     const userMessage: Message = { role: "user", content: trimmed, timestamp: new Date() };
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setIsLoading(true);
-
     sendMessage.mutate({
       sessionKey,
       message: trimmed,
@@ -430,38 +489,35 @@ export default function Chat() {
           )}
 
           {/* Message list */}
-          {messages.map((message, index) => (
-            <div key={index}>
-              {message.role === "user" ? (
-                /* User message — right-aligned, compact bubble */
-                <div className="flex items-start gap-2 flex-row-reverse">
-                  <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-secondary border border-border mt-0.5">
-                    <User className="w-3.5 h-3.5 text-muted-foreground" />
-                  </div>
-                  <div className="min-w-0 max-w-[82%] sm:max-w-[72%] bg-primary text-primary-foreground rounded-2xl rounded-tr-sm px-3 sm:px-4 py-2.5 sm:py-3 overflow-hidden">
-                    <p className="text-sm leading-relaxed break-words whitespace-pre-wrap">{message.content}</p>
-                    <div className="flex items-center justify-end mt-1.5">
-                      <span className="text-xs text-primary-foreground/60">
-                        {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                      </span>
-                    </div>
+          {messages.map((message, index) =>
+            message.role === "user" ? (
+              /* User message — compact right-aligned bubble */
+              <div key={index} className="flex items-start gap-2 flex-row-reverse">
+                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-secondary border border-border mt-0.5">
+                  <User className="w-3.5 h-3.5 text-muted-foreground" />
+                </div>
+                <div className="min-w-0 max-w-[80%] sm:max-w-[70%] bg-primary text-primary-foreground rounded-2xl rounded-tr-sm px-3 sm:px-4 py-2.5 overflow-hidden">
+                  <p className="text-sm leading-relaxed break-words whitespace-pre-wrap">{message.content}</p>
+                  <div className="flex items-center justify-end mt-1.5">
+                    <span className="text-xs text-primary-foreground/60">
+                      {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                    </span>
                   </div>
                 </div>
-              ) : (
-                /* Assistant message — full width */
-                <AssistantMessage
-                  message={message}
-                  index={index}
-                  speakingIndex={speakingIndex}
-                  onSpeak={speakMessage}
-                />
-              )}
-            </div>
-          ))}
+              </div>
+            ) : (
+              /* Assistant message — full width */
+              <AssistantMessage
+                key={index}
+                message={message}
+                index={index}
+                speakingIndex={speakingIndex}
+                onSpeak={speakMessage}
+              />
+            )
+          )}
 
-          {/* Typing indicator */}
           {isLoading && <TypingIndicator />}
-
           <div ref={messagesEndRef} />
         </div>
       </div>
@@ -470,7 +526,6 @@ export default function Chat() {
       <div className="border-t border-border/50 bg-background/80 backdrop-blur-sm flex-shrink-0">
         <div className="container py-3 sm:py-4">
           <div className="flex gap-2 items-end">
-            {/* Voice input button */}
             <Button
               onClick={startVoiceInput}
               size="icon"
