@@ -18,6 +18,7 @@ import {
   getRecentSessions,
 } from "./db";
 import { kimiChat } from "./kimi";
+import { generateImage } from "./_core/imageGeneration";
 import { processFeed, crawlNextUrl, seedCrawlQueue } from "./feedIngestion";
 import { decodeOduForSituation, queryMedicineKnowledge, groundedOwnerChat, retrieveRelevantKnowledge } from "./ifaEngine";
 import { getDb } from "./db";
@@ -169,6 +170,35 @@ export const appRouter = router({
           tokenCount: kimiResponse.tokenCount,
           sessionId: session.id,
         };
+      }),
+
+    generateContextImage: publicProcedure
+      .input(
+        z.object({
+          topic: z.string().min(1).max(500),
+          oduName: z.string().optional(),
+          domain: z.string().optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        try {
+          const domainStyle = input.domain === "quantum_physics"
+            ? "quantum physics visualization, sacred geometry, glowing particles, wave functions"
+            : input.domain === "ifa_studies"
+            ? "Yoruba If\u00e1 divination, sacred Yoruba symbols, West African spiritual art, cowrie shells"
+            : input.domain === "epigenetics"
+            ? "DNA double helix, cellular biology, bioluminescent patterns, gene expression"
+            : input.domain === "psychology"
+            ? "human mind, neural pathways, contemplative meditation, consciousness"
+            : "nature, cosmic patterns, sacred wisdom, universal energy";
+          const oduRef = input.oduName ? `Inspired by the If\u00e1 Od\u00f9 ${input.oduName}. ` : "";
+          const prompt = `Cinematic, photorealistic, dark atmospheric art: ${input.topic}. ${domainStyle}. ${oduRef}Deep indigo and violet tones, soft golden light, mystical and contemplative. No text, no words, no letters in the image.`;
+          const result = await generateImage({ prompt });
+          return { url: result.url ?? null };
+        } catch (err) {
+          console.error("[ImageGen] Failed:", err);
+          return { url: null };
+        }
       }),
   }),
 

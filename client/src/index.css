@@ -1,6 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap");
 @import "tailwindcss";
 @import "tw-animate-css";
+@plugin "@tailwindcss/typography";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -141,6 +142,90 @@
     0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
     30% { transform: translateY(-6px); opacity: 1; }
   }
+}
+
+/* ============================================================
+   Chat bubble prose overrides — keep headings compact inside
+   message bubbles so they don't overflow on mobile
+   ============================================================ */
+.chat-prose {
+  font-size: 0.875rem; /* 14px */
+  line-height: 1.6;
+  color: inherit;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+.chat-prose h1,
+.chat-prose h2 {
+  font-size: 1rem; /* 16px — same as body, just bold */
+  font-weight: 700;
+  margin-top: 1rem;
+  margin-bottom: 0.35rem;
+  line-height: 1.4;
+  letter-spacing: 0.01em;
+}
+.chat-prose h3,
+.chat-prose h4 {
+  font-size: 0.9375rem; /* 15px */
+  font-weight: 600;
+  margin-top: 0.75rem;
+  margin-bottom: 0.25rem;
+  line-height: 1.4;
+}
+.chat-prose p {
+  margin-top: 0;
+  margin-bottom: 0.6rem;
+}
+.chat-prose p:last-child { margin-bottom: 0; }
+.chat-prose ul,
+.chat-prose ol {
+  padding-left: 1.25rem;
+  margin-bottom: 0.6rem;
+}
+.chat-prose li { margin-bottom: 0.2rem; }
+.chat-prose strong { font-weight: 700; }
+.chat-prose em { font-style: italic; }
+.chat-prose code {
+  font-size: 0.8125rem;
+  background: oklch(0.15 0.02 260 / 0.8);
+  padding: 0.1em 0.35em;
+  border-radius: 0.25rem;
+}
+.chat-prose pre {
+  background: oklch(0.10 0.015 260);
+  border: 1px solid oklch(0.22 0.02 260);
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  overflow-x: auto;
+  font-size: 0.8125rem;
+  margin-bottom: 0.6rem;
+}
+.chat-prose blockquote {
+  border-left: 3px solid oklch(0.65 0.22 280 / 0.5);
+  padding-left: 0.75rem;
+  color: oklch(0.70 0.01 260);
+  font-style: italic;
+  margin: 0.5rem 0;
+}
+.chat-prose hr {
+  border: none;
+  border-top: 1px solid oklch(0.22 0.02 260);
+  margin: 0.75rem 0;
+}
+/* Pillar dividers — bold heading lines */
+.chat-prose h2:has(+ *) {
+  border-bottom: 1px solid oklch(0.65 0.22 280 / 0.2);
+  padding-bottom: 0.2rem;
+}
+
+/* Image inside chat bubble */
+.chat-image {
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  border-radius: 0.75rem;
+  margin: 0.75rem 0;
+  border: 1px solid oklch(0.22 0.02 260);
 }
 
 @layer components {

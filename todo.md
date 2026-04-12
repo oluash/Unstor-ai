@@ -357,3 +357,13 @@
 ## 3-Pillar Response Format (Apr 12 20- [x] Rewrite system prompt: every response must include (1) Odù reference, (2) scientific backing, (3) real-world physical exampl- [x] Update RAG engine: always retrieve Ifá Odù context first in the knowledge- [x] Odù-to-topic mapping — handled by RAG keyword search across all 256 Odù (primaryName, summary, lifeApplications)- [x] Update response format instructions in kimi.ts to enforce the 3-pillar structure (already applied in earlier session)
 - [x] Add example responses in the system prompt showing the correct format — worked example with Ogbe Ate added to kimi.ts
 - [x] Run tests and save checkpoint — 39 tests passing, 0 TypeScript errors
+
+## Chat UI Fixes & AI Images (Apr 12 2026)
+
+- [x] Fix chat bubble: constrain max-width (max-w-[86%] mobile, 80% desktop), overflow-wrap, word-break
+- [x] Scale down heading sizes in markdown rendering — .chat-prose: h1/h2 → 16px bold, h3/h4 → 15px semibold
+- [x] Add .chat-prose class — 14px base font, compact margins, overflow-wrap, word-break; @tailwindcss/typography activated
+- [x] Add AI-generated contextual image at top of each Unstor response bubble (cinematic dark art, domain-aware prompt)
+- [x] Add chat.generateContextImage tRPC mutation — topic + Odù name extracted from response, domain-specific art style
+- [x] Display image in chat bubble with .chat-image class — rounded-xl, border, max-height 220px, lazy loading
+- [x] Run tests and save checkpoint — 39 tests passing, 0 TypeScript errors

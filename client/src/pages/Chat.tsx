@@ -1,11 +1,11 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "wouter";
-import { Brain, ArrowLeft, Loader2, User, Sparkles, Send, Mic, MicOff, Download, Volume2, VolumeX } from "lucide-react";
+import { Brain, ArrowLeft, Loader2, User, Sparkles, Send, Mic, MicOff, Download, Volume2, VolumeX, ImageOff } from "lucide-react";
 import { Streamdown } from "streamdown";
 import { nanoid } from "nanoid";
 import { toast } from "sonner";
@@ -16,6 +16,7 @@ interface Message {
   role: "user" | "assistant";
   content: string;
   timestamp: Date;
+  imageUrl?: string | null;
 }
 
 function TypingIndicator() {
@@ -54,6 +55,22 @@ declare global {
   }
 }
 
+/** Extract a short topic phrase from the first 120 chars of a response */
+function extractTopic(content: string): string {
+  // Try to grab text after "PILLAR 1" heading
+  const pillar1Match = content.match(/PILLAR\s+1[^:]*:\s*([^\n]{10,80})/i);
+  if (pillar1Match) return pillar1Match[1].trim();
+  // Grab the first sentence
+  const firstSentence = content.replace(/[#*_>`]/g, "").split(/[.!?]/)[0]?.trim();
+  return firstSentence?.slice(0, 120) ?? content.slice(0, 120);
+}
+
+/** Try to extract the Odù name from the response */
+function extractOduName(content: string): string | undefined {
+  const match = content.match(/\b(Ogbe|Oyeku|Iwori|Odi|Irosun|Owonrin|Obara|Okanran|Ogunda|Osa|Ika|Oturupon|Otura|Irete|Ose|Ofun)\s+\w+/i);
+  return match?.[0];
+}
+
 export default function Chat() {
   const { user } = useAuth();
   const [sessionKey] = useState(() => `session_${nanoid()}`);
@@ -75,7 +92,6 @@ export default function Chat() {
       return;
     }
     window.speechSynthesis.cancel();
-    // Strip markdown symbols for cleaner speech
     const cleanText = text.replace(/[*#`_~>]/g, "").replace(/\n+/g, " ");
     const utterance = new SpeechSynthesisUtterance(cleanText);
     utterance.rate = 0.95;
@@ -90,6 +106,7 @@ export default function Chat() {
     setSpeakingIndex(index);
     window.speechSynthesis.speak(utterance);
   };
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -145,15 +162,42 @@ export default function Chat() {
   // Dynamic prompt suggestions from the library
   const { data: dynamicSuggestions } = trpc.prompts.getRandom.useQuery({ count: 6 });
 
+  // Image generation mutation
+  const generateContextImage = trpc.chat.generateContextImage.useMutation();
+
   const sendMessage = trpc.chat.sendMessage.useMutation({
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
+      // First add the message without image
+      const msgIndex = messages.length + 1; // +1 for the user message already added
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: data.response, timestamp: new Date() },
+        { role: "assistant", content: data.response, timestamp: new Date(), imageUrl: undefined },
       ]);
       setIsLoading(false);
+
+      // Then generate the contextual image in the background
+      try {
+        const topic = extractTopic(data.response);
+        const oduName = extractOduName(data.response);
+        const result = await generateContextImage.mutateAsync({
+          topic,
+          oduName,
+          domain: "ifa_studies",
+        });
+        if (result.url) {
+          setMessages((prev) =>
+            prev.map((m, i) =>
+              i === prev.length - 1 && m.role === "assistant"
+                ? { ...m, imageUrl: result.url }
+                : m
+            )
+          );
+        }
+      } catch {
+        // Image generation failure is silent — response still shows
+      }
     },
-    onError: (err) => {
+    onError: () => {
       toast.error("Unstor encountered an issue. Please try again.");
       setIsLoading(false);
     },
@@ -214,15 +258,15 @@ export default function Chat() {
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto custom-scrollbar min-h-0">
-        <div className="container max-w-3xl py-5 sm:py-8 space-y-5 sm:space-y-6">
+        <div className="container max-w-2xl py-4 sm:py-6 space-y-4 sm:space-y-5">
           {/* Welcome state */}
           {messages.length === 0 && (
-            <div className="text-center py-16 space-y-4">
+            <div className="text-center py-12 space-y-4">
               <img src={UNSTOR_AVATAR} alt="Unstor" className="w-16 h-16 rounded-2xl object-cover mx-auto" />
               <div>
-                <h2 className="text-xl font-display font-semibold text-foreground">Start a Guided Session</h2>
+                <h2 className="text-lg font-display font-semibold text-foreground">Start a Guided Session</h2>
                 <p className="text-muted-foreground text-sm mt-1 max-w-sm mx-auto">
-                  Describe your situation, concern, or question. Unstor will help you understand patterns and find direction.
+                  Describe your situation, concern, or question. Unstor will respond with Ifá wisdom, science, and a real-world example.
                 </p>
               </div>
               <div className="flex flex-wrap gap-2 justify-center pt-2">
@@ -238,7 +282,7 @@ export default function Chat() {
                   <button
                     key={suggestion}
                     onClick={() => setInput(suggestion)}
-                    className="text-xs px-3 py-1.5 rounded-full border border-border hover:border-primary/40 hover:bg-primary/5 text-muted-foreground hover:text-foreground transition-all text-left max-w-xs"
+                    className="text-xs px-3 py-1.5 rounded-full border border-border hover:border-primary/40 hover:bg-primary/5 text-muted-foreground hover:text-foreground transition-all text-left max-w-[260px]"
                   >
                     {suggestion.length > 80 ? suggestion.slice(0, 77) + "..." : suggestion}
                   </button>
@@ -251,18 +295,18 @@ export default function Chat() {
           {messages.map((message, index) => (
             <div
               key={index}
-              className={`flex items-start gap-3 ${message.role === "user" ? "flex-row-reverse" : ""}`}
+              className={`flex items-start gap-2 sm:gap-3 ${message.role === "user" ? "flex-row-reverse" : ""}`}
             >
               {/* Avatar */}
               <div
-                className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden ${
+                className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden ${
                   message.role === "user"
                     ? "bg-secondary border border-border"
                     : "border-0"
                 }`}
               >
                 {message.role === "user" ? (
-                  <User className="w-4 h-4 text-muted-foreground" />
+                  <User className="w-3.5 h-3.5 text-muted-foreground" />
                 ) : (
                   <img src={UNSTOR_AVATAR} alt="Unstor" className="w-full h-full object-cover" />
                 )}
@@ -270,19 +314,33 @@ export default function Chat() {
 
               {/* Bubble */}
               <div
-                className={`max-w-[88%] sm:max-w-[80%] rounded-2xl px-3 sm:px-4 py-2.5 sm:py-3 ${
+                className={`min-w-0 flex-1 max-w-[86%] sm:max-w-[80%] rounded-2xl px-3 sm:px-4 py-2.5 sm:py-3 overflow-hidden ${
                   message.role === "user"
                     ? "bg-primary text-primary-foreground rounded-tr-sm"
                     : "bg-card border border-border text-card-foreground rounded-tl-sm"
                 }`}
               >
                 {message.role === "assistant" ? (
-                  <div className="prose prose-sm prose-invert max-w-none">
-                    <Streamdown>{message.content}</Streamdown>
-                  </div>
+                  <>
+                    {/* AI-generated contextual image */}
+                    {message.imageUrl && (
+                      <img
+                        src={message.imageUrl}
+                        alt="Contextual illustration"
+                        className="chat-image"
+                        loading="lazy"
+                      />
+                    )}
+                    {/* Markdown content with compact prose */}
+                    <div className="chat-prose">
+                      <Streamdown>{message.content}</Streamdown>
+                    </div>
+                  </>
                 ) : (
-                  <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
+                  <p className="text-sm leading-relaxed break-words whitespace-pre-wrap">{message.content}</p>
                 )}
+
+                {/* Footer: timestamp + TTS */}
                 <div className={`flex items-center justify-between mt-2 gap-2 ${message.role === "user" ? "flex-row-reverse" : ""}`}>
                   <span className={`text-xs ${message.role === "user" ? "text-primary-foreground/60" : "text-muted-foreground"}`}>
                     {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
@@ -291,7 +349,7 @@ export default function Chat() {
                     <button
                       onClick={() => speakMessage(message.content, index)}
                       title={speakingIndex === index ? "Stop speaking" : "Listen to response"}
-                      className="text-muted-foreground hover:text-primary transition-colors"
+                      className="text-muted-foreground hover:text-primary transition-colors p-0.5"
                     >
                       {speakingIndex === index
                         ? <VolumeX className="w-3 h-3" />
@@ -312,15 +370,15 @@ export default function Chat() {
 
       {/* Input */}
       <div className="border-t border-border/50 bg-background/80 backdrop-blur-sm flex-shrink-0">
-        <div className="container max-w-3xl py-3 sm:py-4">
-          <div className="flex gap-2 sm:gap-3 items-end">
+        <div className="container max-w-2xl py-3 sm:py-4">
+          <div className="flex gap-2 items-end">
             {/* Voice input button */}
             <Button
               onClick={startVoiceInput}
               size="icon"
               variant="outline"
               title={isRecording ? "Stop recording" : "Voice input"}
-              className={`w-11 h-11 sm:w-[52px] sm:h-[52px] rounded-xl flex-shrink-0 transition-all ${
+              className={`w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex-shrink-0 transition-all ${
                 isRecording
                   ? "border-red-500/60 bg-red-500/10 text-red-400 hover:bg-red-500/20 animate-pulse"
                   : "border-border text-muted-foreground hover:text-foreground hover:border-primary/40"
@@ -329,14 +387,14 @@ export default function Chat() {
             >
               {isRecording ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
             </Button>
-            <div className="flex-1 relative">
+            <div className="flex-1 relative min-w-0">
               <Textarea
                 ref={textareaRef}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder={isRecording ? "Listening..." : "Message Unstor..."}
-                className="resize-none min-h-[44px] sm:min-h-[52px] max-h-[120px] sm:max-h-[200px] bg-card border-border focus:border-primary/50 text-foreground placeholder:text-muted-foreground rounded-xl pr-3 sm:pr-4 py-2.5 sm:py-3 text-sm custom-scrollbar"
+                className="resize-none min-h-[40px] sm:min-h-[44px] max-h-[120px] bg-card border-border focus:border-primary/50 text-foreground placeholder:text-muted-foreground rounded-xl pr-3 py-2.5 text-sm custom-scrollbar"
                 rows={1}
                 disabled={isLoading}
               />
@@ -345,7 +403,7 @@ export default function Chat() {
               onClick={handleSend}
               disabled={!input.trim() || isLoading}
               size="icon"
-              className="w-11 h-11 sm:w-[52px] sm:h-[52px] rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground flex-shrink-0"
+              className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground flex-shrink-0"
             >
               {isLoading ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
