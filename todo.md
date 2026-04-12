@@ -367,3 +367,11 @@
 - [x] Add chat.generateContextImage tRPC mutation — topic + Odù name extracted from response, domain-specific art style
 - [x] Display image in chat bubble with .chat-image class — rounded-xl, border, max-height 220px, lazy loading
 - [x] Run tests and save checkpoint — 39 tests passing, 0 TypeScript errors
+
+## Chat Heading Size Fix (Apr 12 2026)
+
+- [x] Diagnose why .chat-prose CSS is not applying to Streamdown rendered output — className was on parent div, not Streamdown component
+- [x] Apply CSS overrides — pass className="chat-prose" directly to <Streamdown> component so it merges with its wrapper div
+- [x] Reduce PILLAR heading sizes — h1/h2 → 16px bold, h3/h4 → 15px semibold via .chat-prose CSS rules
+- [x] Reduce bullet list indentation — padding-left: 1.25rem in .chat-prose ul/ol
+- [x] Run tests and save checkpoint — 39 tests passing, 0 TypeScript errors

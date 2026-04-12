@@ -332,9 +332,7 @@ export default function Chat() {
                       />
                     )}
                     {/* Markdown content with compact prose */}
-                    <div className="chat-prose">
-                      <Streamdown>{message.content}</Streamdown>
-                    </div>
+                    <Streamdown className="chat-prose">{message.content}</Streamdown>
                   </>
                 ) : (
                   <p className="text-sm leading-relaxed break-words whitespace-pre-wrap">{message.content}</p>
