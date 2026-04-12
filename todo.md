@@ -416,3 +416,11 @@
 - [x] Render styled QuoteBlock component: left accent border, italic quote text, attribution line
 - [x] Apply to both Chat.tsx and OwnerChat.tsx
 - [x] Run tests and save checkpoint
+
+## Full Ese (Ifá Verse) in Pillar 1 (Apr 12 2026)
+
+- [x] Update groundedOwnerChat system prompt: Pillar 1 must include the full Ese verse (original Yoruba + English translation) from the relevant Odù, presented as a formatted verse block in the response body
+- [x] Update decodeOduForSituation system prompt: same — include full Ese verse in the reading
+- [x] Ese verse must be clearly labelled (e.g. "Ese — The Verse:"), formatted as a distinct verse block with Yoruba original and English translation on separate lines
+- [x] ODU_QUOTE marker should then quote the most powerful single line from the Ese as the pull-quote
+- [x] Run tests and save checkpoint
