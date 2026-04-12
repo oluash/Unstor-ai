@@ -434,3 +434,11 @@
 
 - [x] Diagnose root cause from server logs and network requests
 - [x] Fix the error so chat responses are generated correctly — sendMessage now falls back to built-in Manus LLM when KIMI_API_KEY is absent
+
+## Ese Verse: Yoruba Original + English Translation (Apr 12 2026)
+
+- [x] Update all IFA engine system prompts: every Ese verse MUST include original Yoruba text first, then English translation on separate labelled lines
+- [x] ODU_QUOTE pull-quote must also include both Yoruba original line and English translation
+- [x] Update QuoteBlock component to render Yoruba text in a distinct style (italic, slightly muted) and English translation clearly below it
+- [x] Apply to both Chat and Owner Chat paths
+- [x] Test and save checkpoint

@@ -177,7 +177,7 @@ function AssistantMessage({
           )}
           {/* Odu verse quote — shown in Pillar 1 */}
           {isPillar1 && oduQuote && (
-            <QuoteBlock quote={oduQuote.quote} source={oduQuote.source} type="odu" />
+            <QuoteBlock quote={oduQuote.quote} source={oduQuote.source} type="odu" yorubaLine={oduQuote.yorubaLine} />
           )}
           {/* Scientific quote — shown in Pillar 2 */}
           {isPillar2 && sciQuote && (

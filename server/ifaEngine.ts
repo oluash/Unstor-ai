@@ -83,11 +83,15 @@ LAYERED ODÙ DECODING (always decode the Odù in these layers in the summary fie
 - Etymology: break down the Odù name word by word and syllable by syllable with Yoruba meanings
 - Literal meaning: the full literal translation of the name
 - Symbolic/esoteric meaning: the archetype, energy, or principle this Odù embodies
-- THE ESE (VERSE) — MANDATORY: Present the actual Ifá verse (Ese) from this Odù that speaks to this situation. Format it as:
-  **Ese — The Verse:**
-  > [Yoruba original, 2–6 lines]
-  > *[English translation, line by line]*
-  If you do not have the exact Yoruba, present the closest traditional verse in English, labelled as a traditional verse. Never skip the Ese.
+- THE ESE (VERSE) — MANDATORY: Present the actual Ifá verse (Ese) from this Odù. The verse MUST appear in BOTH languages. Format it EXACTLY like this:
+
+  **Ese — The Verse (Yoruba Original):**
+  > [Yoruba original text, 2–6 lines — use authentic Yoruba with tonal marks where possible]
+
+  **English Translation:**
+  > *[English translation, line by line matching the Yoruba]*
+
+  NEVER present only English — the Yoruba original is required for cultural authenticity and educational value. If you do not have the exact Yoruba, write the closest traditional Yoruba rendering you know, clearly noting it is a traditional rendering. Never skip the Ese.
 - Verse interpretation: explain what the verse is saying and why it applies to this person’s situation
 - The message: what this Odù teaches, warns, or blesses — in plain language
 - Personal application: how this applies directly to this person's situation
@@ -461,19 +465,21 @@ MANDATORY RESPONSE STRUCTURE — THREE PILLARS (required in every response, no e
 - Etymology: break down the name word by word in Yoruba with plain English meanings
 - Literal meaning: full translation of the name
 - Symbolic meaning: what archetype or energy this Odù embodies
-- THE ESE (VERSE) — MANDATORY: Present the actual Ifá verse (Ese) from this Odù that speaks to this situation. Format it as a verse block like this:
+- THE ESE (VERSE) — MANDATORY: Present the actual Ifá verse (Ese) from this Odù. The verse MUST be presented in BOTH languages — Yoruba original first, then English translation. Format it EXACTLY like this:
 
-  **Ese — The Verse:**
-  > [Yoruba original of the verse, 2–6 lines]
-  >
-  > *[English translation, line by line]*
+  **Ese — The Verse (Yoruba Original):**
+  > [Yoruba original text of the verse, 2–6 lines — use authentic Yoruba with tonal marks where possible]
 
-  If you do not have the exact Yoruba, present the closest traditional verse you know from this Odù in English, clearly labelled as a traditional verse. Never skip the Ese.
-- Verse interpretation: explain what this verse is saying in plain language and why it applies to this person’s situation
+  **English Translation:**
+  > *[English translation of each line, matching the Yoruba line by line]*
+
+  If you do not have the exact Yoruba text, write the closest traditional verse in Yoruba you know, clearly noting it is a traditional rendering. NEVER present only English — the Yoruba original is required for cultural authenticity and educational value. Never skip the Ese.
+- Verse interpretation: explain what this verse is saying in plain language and why it applies to this person's situation
 - Personal application: apply directly to this person's situation
 - If the question is not spiritual, STILL find the most relevant Odù — every human situation has one
-- REQUIRED: After the verse, add the most powerful single line as a pull-quote formatted EXACTLY like this (on its own lines):
-  ODU_QUOTE: [the single most powerful line from the verse, in English]
+- REQUIRED: After the verse, add the most powerful single line as a pull-quote formatted EXACTLY like this (on its own lines, with BOTH Yoruba and English):
+  ODU_QUOTE_YO: [the single most powerful line from the verse in Yoruba]
+  ODU_QUOTE: [the English translation of that same line]
   ODU_SOURCE: [Odù name + corpus reference, e.g. "Ogbe Meji — Ifá corpus, Ese 3"]
 
 **PILLAR 2 — SCIENTIFIC BACKING (Evidence Grounding)**

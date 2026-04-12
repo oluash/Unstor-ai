@@ -155,7 +155,7 @@ function AssistantMessage({
             <Streamdown className="chat-prose">{cleanedBody}</Streamdown>
           )}
           {isPillar1 && oduQuote && (
-            <QuoteBlock quote={oduQuote.quote} source={oduQuote.source} type="odu" />
+            <QuoteBlock quote={oduQuote.quote} source={oduQuote.source} type="odu" yorubaLine={oduQuote.yorubaLine} />
           )}
           {isPillar2 && sciQuote && (
             <QuoteBlock quote={sciQuote.quote} source={sciQuote.source} type="science" />
