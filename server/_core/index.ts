@@ -8,6 +8,7 @@ import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
 import { startResearchAgent } from "../researchAgent";
+import { startAutonomousEngine } from "../autonomousEngine";
 import { seedDomainKnowledge } from "../seedDomainKnowledge";
 
 function isPortAvailable(port: number): Promise<boolean> {
@@ -63,6 +64,8 @@ async function startServer() {
     console.log(`Server running on http://localhost:${port}/`);
     // Start autonomous research agent (arXiv + PubMed daily ingestion)
     startResearchAgent();
+    // Start Unstor autonomous operation engine (consolidation, readiness, Odu enrichment)
+    startAutonomousEngine();
     // Seed domain knowledge tables (quantum, psychology, epigenetics) if empty
     seedDomainKnowledge().catch(console.error);
   });

@@ -462,9 +462,9 @@
 
 ## Bug: Cannot Access Account / Login Fails (Apr 12 2026)
 
-- [ ] Diagnose OAuth/login error from server logs
-- [ ] Fix the login flow so users can access their accounts
-- [ ] Test and save checkpoint
+- [x] Diagnose OAuth/login error from server logs — root cause: Manus OAuth required Manus account
+- [x] Fix the login flow — added standalone email/password register/login at /login
+- [x] Test and save checkpoint
 
 ## Standalone Auth — Google + Email/Password (Apr 12 2026)
 
@@ -477,3 +477,23 @@
 - [x] Protect routes: redirect unauthenticated users to /login (getLoginUrl now points to /login)
 - [x] Update useAuth hook — no change needed, existing JWT cookie mechanism works for both auth paths
 - [x] Test all auth flows and save checkpoint
+
+## Autonomous Operation + Open Source Release (Apr 12 2026)
+
+### Autonomous Operation
+- [x] Add autonomous learning scheduler: hourly knowledge consolidation, daily snapshot, weekly deep-crawl cycle
+- [x] Add self-health monitor: detects stale knowledge base, low readiness score, and triggers re-learning automatically
+- [x] Add autonomous Odu enrichment: background job that fills missing Ese verses, taboos, prescriptions for all 256 Odu
+- [x] Add autonomous medicine knowledge enrichment: background job that expands herb database from trusted sources
+- [x] Add auto-notification to owner when Unstor reaches a new readiness milestone (every 10% increase)
+- [x] Add graceful error recovery: if any background job fails, log and retry with exponential backoff
+
+### Open Source Preparation
+- [x] Write comprehensive README.md: project overview, features, tech stack, setup instructions, env vars, deployment guide
+- [x] Add LICENSE file (MIT License)
+- [x] Add ENV_EXAMPLE.md with all required environment variables documented
+- [x] Add CONTRIBUTING.md: how to contribute, code style, PR process
+- [x] Add ARCHITECTURE.md: system design, knowledge graph, IFA engine, learning pipeline diagrams
+- [x] Remove any hardcoded secrets or owner-specific data from codebase
+- [ ] Export to GitHub via Settings → GitHub panel (user action required)
+- [x] Test and save checkpoint
