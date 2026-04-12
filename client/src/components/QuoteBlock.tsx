@@ -1,5 +1,7 @@
-import React from "react";
+import React, { useState, useCallback } from "react";
 import { Link } from "wouter";
+import { Copy, Check, Volume2, VolumeX, ExternalLink } from "lucide-react";
+import { toast } from "sonner";
 
 interface QuoteBlockProps {
   quote: string;
@@ -11,33 +13,126 @@ interface QuoteBlockProps {
 /**
  * Styled quote block used inside Unstor responses.
  * - "odu" variant: amber/gold accent — for Ifá verses and Odù proverbs
- *   Shows Yoruba original (italic, muted) above English translation when available
+ *   Shows Yoruba original (italic, muted) above English translation when available.
+ *   Includes: Copy verse button, Yoruba TTS button, View Odù reference link.
  * - "science" variant: indigo/cyan accent — for scientific findings and citations
  */
 export function QuoteBlock({ quote, source, type, yorubaLine }: QuoteBlockProps) {
   const isOdu = type === "odu";
+  const [copied, setCopied] = useState(false);
+  const [speaking, setSpeaking] = useState(false);
+
+  // Extract Odù name from source (e.g. "Ogbe Meji — Ifá corpus, Ese 3" → "Ogbe Meji")
+  const oduNameForLink = isOdu ? (source.split("—")[0]?.trim() ?? source) : "";
+
+  const handleCopy = useCallback(() => {
+    const textToCopy = yorubaLine
+      ? `${yorubaLine}\n\n${quote}\n\n— ${source}`
+      : `${quote}\n\n— ${source}`;
+    navigator.clipboard.writeText(textToCopy).then(() => {
+      setCopied(true);
+      toast.success("Verse copied to clipboard");
+      setTimeout(() => setCopied(false), 2000);
+    }).catch(() => {
+      toast.error("Could not copy — please copy manually");
+    });
+  }, [quote, source, yorubaLine]);
+
+  const handleSpeak = useCallback(() => {
+    if (!window.speechSynthesis) {
+      toast.error("Text-to-speech is not supported in this browser.");
+      return;
+    }
+    if (speaking) {
+      window.speechSynthesis.cancel();
+      setSpeaking(false);
+      return;
+    }
+    const textToSpeak = yorubaLine ?? quote;
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(textToSpeak);
+    utterance.rate = 0.85;
+    utterance.pitch = 1.05;
+    utterance.volume = 1.0;
+    // Prefer a Yoruba or African voice if available, else use a natural English voice
+    const voices = window.speechSynthesis.getVoices();
+    const yorubaVoice =
+      voices.find((v) => v.lang.startsWith("yo")) ??
+      voices.find((v) => v.lang.startsWith("en") && v.name.toLowerCase().includes("natural")) ??
+      voices.find((v) => v.lang.startsWith("en"));
+    if (yorubaVoice) utterance.voice = yorubaVoice;
+    utterance.onend = () => setSpeaking(false);
+    utterance.onerror = () => setSpeaking(false);
+    window.speechSynthesis.speak(utterance);
+    setSpeaking(true);
+  }, [speaking, yorubaLine, quote]);
 
   return (
     <div className={`quote-block ${isOdu ? "quote-block--odu" : "quote-block--science"}`}>
       <div className="quote-block__mark">{"\u201C"}</div>
+
+      {/* Yoruba original */}
       {isOdu && yorubaLine && (
         <blockquote className="quote-block__yoruba">{yorubaLine}</blockquote>
       )}
+
+      {/* English translation */}
       <blockquote className="quote-block__text">{quote}</blockquote>
+
+      {/* Language label */}
       {isOdu && yorubaLine && (
         <div className="quote-block__lang-label">Yoruba · English</div>
       )}
-      <cite className="quote-block__source">
-        {isOdu ? "📿 " : "🔬 "}
-        {isOdu ? (
-          <Link
-            href={`/ifa/${encodeURIComponent(source.split("—")[0]?.trim() ?? source)}`}
-            className="hover:underline hover:opacity-90 transition-opacity"
-          >
-            {source}
-          </Link>
-        ) : source}
-      </cite>
+
+      {/* Footer: source + action buttons */}
+      <div className="quote-block__footer">
+        <cite className="quote-block__source">
+          {isOdu ? "📿 " : "🔬 "}
+          {isOdu ? (
+            <Link
+              href={`/ifa/${encodeURIComponent(oduNameForLink)}`}
+              className="hover:underline hover:opacity-90 transition-opacity"
+            >
+              {source}
+            </Link>
+          ) : source}
+        </cite>
+
+        {/* Action buttons — only on ODU blocks */}
+        {isOdu && (
+          <div className="quote-block__actions">
+            {/* TTS — read Yoruba aloud */}
+            <button
+              onClick={handleSpeak}
+              title={speaking ? "Stop recitation" : "Listen to Yoruba verse"}
+              className="quote-block__action-btn"
+              aria-label={speaking ? "Stop" : "Listen"}
+            >
+              {speaking ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
+            </button>
+
+            {/* Copy verse */}
+            <button
+              onClick={handleCopy}
+              title="Copy verse to clipboard"
+              className="quote-block__action-btn"
+              aria-label="Copy verse"
+            >
+              {copied ? <Check className="w-3.5 h-3.5 text-green-400" /> : <Copy className="w-3.5 h-3.5" />}
+            </button>
+
+            {/* View full Odù reference */}
+            <Link
+              href={`/ifa/${encodeURIComponent(oduNameForLink)}`}
+              className="quote-block__action-btn quote-block__ref-link"
+              title={`View full ${oduNameForLink} reference`}
+            >
+              <ExternalLink className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline text-xs">View Odù</span>
+            </Link>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

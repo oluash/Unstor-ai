@@ -1,13 +1,17 @@
 import { useParams, Link } from "wouter";
+import { useState, useCallback } from "react";
 import { trpc } from "@/lib/trpc";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Streamdown } from "streamdown";
-import { ArrowLeft, BookOpen, Loader2, Leaf, Shield, Sparkles, Hash, Palette, Star } from "lucide-react";
+import { ArrowLeft, BookOpen, Loader2, Leaf, Shield, Sparkles, Hash, Palette, Star, Copy, Check, Volume2, VolumeX } from "lucide-react";
+import { toast } from "sonner";
 
 export default function IFAReference() {
   const params = useParams<{ oduName: string }>();
   const oduName = decodeURIComponent(params.oduName ?? "");
+  const [copied, setCopied] = useState(false);
+  const [speaking, setSpeaking] = useState(false);
 
   const { data, isLoading, error } = trpc.ifa.getByName.useQuery(
     { name: oduName },
@@ -90,10 +94,51 @@ export default function IFAReference() {
             {/* Ese verse */}
             {odu.eseVerses && (
               <section className="space-y-3">
-                <h2 className="text-lg font-semibold text-amber-400 flex items-center gap-2">
-                  <BookOpen className="w-4 h-4" />
-                  The Ese (Sacred Verse)
-                </h2>
+                <div className="flex items-center justify-between gap-2 flex-wrap">
+                  <h2 className="text-lg font-semibold text-amber-400 flex items-center gap-2">
+                    <BookOpen className="w-4 h-4" />
+                    The Ese (Sacred Verse)
+                  </h2>
+                  <div className="flex items-center gap-2">
+                    {/* TTS */}
+                    <button
+                      onClick={() => {
+                        if (!window.speechSynthesis) { toast.error("TTS not supported"); return; }
+                        if (speaking) { window.speechSynthesis.cancel(); setSpeaking(false); return; }
+                        window.speechSynthesis.cancel();
+                        const utt = new SpeechSynthesisUtterance(odu.eseVerses ?? "");
+                        utt.rate = 0.82; utt.pitch = 1.05;
+                        const voices = window.speechSynthesis.getVoices();
+                        const v = voices.find(v => v.lang.startsWith("yo")) ?? voices.find(v => v.lang.startsWith("en"));
+                        if (v) utt.voice = v;
+                        utt.onend = () => setSpeaking(false);
+                        utt.onerror = () => setSpeaking(false);
+                        window.speechSynthesis.speak(utt);
+                        setSpeaking(true);
+                      }}
+                      className="quote-block__action-btn"
+                      title={speaking ? "Stop" : "Listen to verse"}
+                    >
+                      {speaking ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
+                      <span className="text-xs hidden sm:inline">{speaking ? "Stop" : "Listen"}</span>
+                    </button>
+                    {/* Copy */}
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(odu.eseVerses ?? "").then(() => {
+                          setCopied(true);
+                          toast.success("Verse copied to clipboard");
+                          setTimeout(() => setCopied(false), 2000);
+                        }).catch(() => toast.error("Could not copy"));
+                      }}
+                      className="quote-block__action-btn"
+                      title="Copy verse"
+                    >
+                      {copied ? <Check className="w-3.5 h-3.5 text-green-400" /> : <Copy className="w-3.5 h-3.5" />}
+                      <span className="text-xs hidden sm:inline">Copy</span>
+                    </button>
+                  </div>
+                </div>
                 <div className="ifa-verse-block">
                   <Streamdown className="chat-prose">{odu.eseVerses}</Streamdown>
                 </div>

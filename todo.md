@@ -451,3 +451,11 @@
 - [x] Link pull-quote ODU_SOURCE attribution line to /ifa/[odu-name] in both Chat and OwnerChat
 - [x] Register /ifa/:oduName route in App.tsx
 - [x] Test and save checkpoint
+
+## Ese Block Enhancements (Apr 12 2026)
+
+- [x] Add "Copy verse" button on ODU QuoteBlock — copies Yoruba original + English translation to clipboard
+- [x] Add Yoruba TTS button on ODU QuoteBlock — reads Yoruba verse aloud using SpeechSynthesis
+- [x] Add prominent "View full Odù reference →" link button on the ODU QuoteBlock (in addition to the source attribution link)
+- [x] Add same Copy + TTS buttons to the Ese verse block on the IFA reference page
+- [x] Test and save checkpoint

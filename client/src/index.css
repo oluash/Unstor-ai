@@ -355,6 +355,53 @@
   display: block;
 }
 
+.quote-block__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+.quote-block__actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.quote-block__action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 7px;
+  border-radius: 0.375rem;
+  background: oklch(0.22 0.03 60 / 0.5);
+  border: 1px solid oklch(0.72 0.18 60 / 0.2);
+  color: oklch(0.72 0.12 60);
+  cursor: pointer;
+  font-size: 0.7rem;
+  transition: background 0.15s, color 0.15s;
+  text-decoration: none;
+}
+
+.quote-block__action-btn:hover {
+  background: oklch(0.28 0.05 60 / 0.7);
+  color: oklch(0.88 0.18 60);
+}
+
+.quote-block__ref-link {
+  background: oklch(0.18 0.06 280 / 0.4);
+  border-color: oklch(0.65 0.22 280 / 0.25);
+  color: oklch(0.72 0.18 280);
+}
+
+.quote-block__ref-link:hover {
+  background: oklch(0.25 0.08 280 / 0.6);
+  color: oklch(0.85 0.22 280);
+}
+
 .quote-block__lang-label {
   font-size: 0.65rem;
   letter-spacing: 0.09em;
