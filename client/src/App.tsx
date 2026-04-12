@@ -17,6 +17,7 @@ import PsychologyEpigenetics from "./pages/PsychologyEpigenetics";
 import PromptLibrary from "./pages/PromptLibrary";
 import Research from "./pages/Research";
 import Activation from "./pages/Activation";
+import IFAReference from "./pages/IFAReference";
 
 function Router() {
   return (
@@ -28,6 +29,7 @@ function Router() {
       <Route path="/inspect" component={OwnerInspection} />
       <Route path="/feed" component={FeedManager} />
       <Route path="/ifa" component={IfaExplorer} />
+      <Route path="/ifa/:oduName" component={IFAReference} />
       <Route path="/owner-chat" component={OwnerChat} />
       <Route path="/quantum" component={QuantumExplorer} />
       <Route path="/psychology" component={PsychologyEpigenetics} />

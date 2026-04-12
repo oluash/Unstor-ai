@@ -442,3 +442,12 @@
 - [x] Update QuoteBlock component to render Yoruba text in a distinct style (italic, slightly muted) and English translation clearly below it
 - [x] Apply to both Chat and Owner Chat paths
 - [x] Test and save checkpoint
+
+## Odù Reference Page /ifa/[odu-name] (Apr 12 2026)
+
+- [x] Add tRPC procedure: ifa.getOdu(name) — looks up Odu from DB, falls back to LLM-generated content
+- [x] Build /ifa/:oduName page: full Ese in Yoruba + English, etymology breakdown, symbolic meaning, taboos (eewo), prescriptions (ebo), relevant herbs
+- [x] Add navigation: back button, link to /ifa index
+- [x] Link pull-quote ODU_SOURCE attribution line to /ifa/[odu-name] in both Chat and OwnerChat
+- [x] Register /ifa/:oduName route in App.tsx
+- [x] Test and save checkpoint

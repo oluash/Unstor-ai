@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "wouter";
 
 interface QuoteBlockProps {
   quote: string;
@@ -28,7 +29,14 @@ export function QuoteBlock({ quote, source, type, yorubaLine }: QuoteBlockProps)
       )}
       <cite className="quote-block__source">
         {isOdu ? "📿 " : "🔬 "}
-        {source}
+        {isOdu ? (
+          <Link
+            href={`/ifa/${encodeURIComponent(source.split("—")[0]?.trim() ?? source)}`}
+            className="hover:underline hover:opacity-90 transition-opacity"
+          >
+            {source}
+          </Link>
+        ) : source}
       </cite>
     </div>
   );

@@ -393,6 +393,36 @@
   color: oklch(0.65 0.22 280);
 }
 
+/* ============================================================
+   IFA Reference Page styles
+   ============================================================ */
+.ifa-verse-block {
+  background: oklch(0.14 0.04 60 / 0.4);
+  border: 1px solid oklch(0.72 0.18 60 / 0.3);
+  border-left: 3px solid oklch(0.72 0.18 60);
+  border-radius: 0.5rem;
+  padding: 16px 20px;
+}
+
+.prose-section {
+  color: var(--foreground);
+}
+
+.ifa-attr-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  padding: 12px 14px;
+}
+
+.ifa-attr-label {
+  font-size: 0.7rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+  font-weight: 600;
+}
+
 /* Legacy chat-image kept for backward compat */
 .chat-image {
   width: 100%;

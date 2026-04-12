@@ -562,6 +562,79 @@ export const appRouter = router({
         return decodeOduForSituation(input.situation, input.oduName);
       }),
 
+    getByName: publicProcedure
+      .input(z.object({ name: z.string().min(1).max(200) }))
+      .query(async ({ input }) => {
+        const db = await getDb();
+        const { like, or } = await import("drizzle-orm");
+        // Try DB first
+        if (db) {
+          const rows = await db
+            .select()
+            .from(ifaOdu)
+            .where(
+              or(
+                like(ifaOdu.primaryName, `%${input.name}%`),
+                like(ifaOdu.summary, `%${input.name}%`)
+              )
+            )
+            .limit(1);
+          if (rows.length > 0) return { source: "db" as const, odu: rows[0] };
+        }
+        // Fall back to LLM-generated content
+        const llmResponse = await invokeLLM({
+          messages: [
+            {
+              role: "system",
+              content: `You are an Ifá scholar with deep knowledge of all 256 Odù. When asked about an Odù, provide a comprehensive structured reference in JSON format with these exact fields:
+- primaryName: string (the canonical Odù name)
+- oduNumber: number (1-256, or 0 if unknown)
+- summary: string (2-3 sentence overview)
+- eseVerses: string (the full Ese verse — Yoruba original first under "Ese — The Verse (Yoruba Original):" then English translation under "English Translation:", 4-8 lines total)
+- taboos: string (eewo — what to avoid, 3-5 items)
+- prescriptions: string (ebo — recommended offerings or actions, 3-5 items)
+- lifeApplications: string (how this Odù applies to everyday life, 2-3 paragraphs)
+- themes: array of strings (3-6 key themes)
+- deities: array of strings (associated Orisha)
+- herbs: array of strings (associated herbs)
+- colors: array of strings (associated colors)
+- numbers: array of numbers (associated numbers)
+Respond ONLY with valid JSON, no markdown fences.`,
+            },
+            { role: "user", content: `Provide the full reference for Odù: ${input.name}` },
+          ],
+          response_format: {
+            type: "json_schema",
+            json_schema: {
+              name: "odu_reference",
+              strict: true,
+              schema: {
+                type: "object",
+                properties: {
+                  primaryName: { type: "string" },
+                  oduNumber: { type: "number" },
+                  summary: { type: "string" },
+                  eseVerses: { type: "string" },
+                  taboos: { type: "string" },
+                  prescriptions: { type: "string" },
+                  lifeApplications: { type: "string" },
+                  themes: { type: "array", items: { type: "string" } },
+                  deities: { type: "array", items: { type: "string" } },
+                  herbs: { type: "array", items: { type: "string" } },
+                  colors: { type: "array", items: { type: "string" } },
+                  numbers: { type: "array", items: { type: "number" } },
+                },
+                required: ["primaryName", "oduNumber", "summary", "eseVerses", "taboos", "prescriptions", "lifeApplications", "themes", "deities", "herbs", "colors", "numbers"],
+                additionalProperties: false,
+              },
+            },
+          },
+        });
+        const raw = llmResponse.choices[0]?.message?.content ?? "{}";
+        const parsed = JSON.parse(typeof raw === "string" ? raw : JSON.stringify(raw));
+        return { source: "llm" as const, odu: parsed };
+      }),
+
     listOdu: adminProcedure
       .input(z.object({ limit: z.number().default(50), offset: z.number().default(0) }))
       .query(async ({ input }) => {
