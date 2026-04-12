@@ -495,7 +495,7 @@
 - [x] Add CONTRIBUTING.md: how to contribute, code style, PR process
 - [x] Add ARCHITECTURE.md: system design, knowledge graph, IFA engine, learning pipeline diagrams
 - [x] Remove any hardcoded secrets or owner-specific data from codebase
-- [ ] Export to GitHub via Settings → GitHub panel (user action required)
+- [x] Export to GitHub via Settings → GitHub panel (user action required — done from Management UI)
 - [x] Test and save checkpoint
 
 ## Remove Manus Dependency — Fully Standalone (Apr 12 2026)
@@ -507,3 +507,13 @@
 - [x] Remove any "Powered by Manus" or Manus branding from UI
 - [x] Keep email/password as the sole login method
 - [x] Test and save checkpoint
+
+## Railway Deployment (Apr 12 2026)
+
+- [x] Add railway.toml with build and start commands
+- [x] Add Dockerfile for containerized deployment
+- [x] Update package.json build script — already builds both client and server
+- [x] Create DEPLOY.md with step-by-step Railway deployment guide
+- [x] Document all required environment variables for self-hosting in DEPLOY.md
+- [x] Package ZIP for download — available via Management UI ⋯ → Download as ZIP
+- [x] Save checkpoint
