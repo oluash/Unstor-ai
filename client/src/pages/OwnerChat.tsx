@@ -5,12 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import {
-  Send, Loader2, Brain, User, Star, Leaf, BookOpen,
+import { Send, Loader2, Brain, User, Star, Leaf, BookOpen,
   Globe, Lock, ChevronDown, ChevronUp, Volume2, VolumeX,
 } from "lucide-react";
 import { getLoginUrl } from "@/const";
 import { Streamdown } from "streamdown";
+import { QuoteBlock, parseQuotes } from "@/components/QuoteBlock";
 
 const UNSTOR_AVATAR = "https://d2xsxph8kpxj0f.cloudfront.net/310519663246644329/WtjdqCZuUAjS52crCAfDKK/unstor-avatar-o6axhgpSuTHquWi5bcWcYG.webp";
 
@@ -143,13 +143,22 @@ function AssistantMessage({
   const renderSections = () =>
     sections.map((section, sIdx) => {
       const img = msg.sectionImages?.find((i) => i.sectionIndex === sIdx);
+      const { cleaned: cleanedBody, oduQuote, sciQuote } = parseQuotes(section.body);
+      const isPillar1 = sIdx === 0;
+      const isPillar2 = sIdx === 1;
       return (
         <div key={sIdx} className="pillar-section">
           {section.heading && (
             <Streamdown className="chat-prose">{section.heading}</Streamdown>
           )}
-          {section.body && (
-            <Streamdown className="chat-prose">{section.body}</Streamdown>
+          {cleanedBody && (
+            <Streamdown className="chat-prose">{cleanedBody}</Streamdown>
+          )}
+          {isPillar1 && oduQuote && (
+            <QuoteBlock quote={oduQuote.quote} source={oduQuote.source} type="odu" />
+          )}
+          {isPillar2 && sciQuote && (
+            <QuoteBlock quote={sciQuote.quote} source={sciQuote.source} type="science" />
           )}
           {img?.url && (
             <div className="ai-image-block">

@@ -312,6 +312,65 @@
   margin-bottom: 0.25rem;
 }
 
+/* ============================================================
+   Quote Blocks — Odu verse and scientific citation
+   ============================================================ */
+.quote-block {
+  position: relative;
+  margin: 14px 0 18px 0;
+  padding: 14px 16px 12px 20px;
+  border-radius: 0.5rem;
+  border-left: 3px solid;
+}
+
+.quote-block--odu {
+  background: oklch(0.14 0.04 60 / 0.5);
+  border-color: oklch(0.72 0.18 60);
+}
+
+.quote-block--science {
+  background: oklch(0.13 0.04 260 / 0.5);
+  border-color: oklch(0.65 0.22 280);
+}
+
+.quote-block__mark {
+  position: absolute;
+  top: 6px;
+  left: 10px;
+  font-size: 1.6rem;
+  line-height: 1;
+  opacity: 0.35;
+}
+
+.quote-block__text {
+  font-style: italic;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: oklch(0.88 0.02 260);
+  margin: 0 0 6px 0;
+  padding: 0;
+}
+
+.quote-block--odu .quote-block__text {
+  color: oklch(0.92 0.06 60);
+}
+
+.quote-block__source {
+  display: block;
+  font-size: 0.75rem;
+  font-style: normal;
+  opacity: 0.7;
+  letter-spacing: 0.01em;
+}
+
+.quote-block--odu .quote-block__source {
+  color: oklch(0.72 0.18 60);
+}
+
+.quote-block--science .quote-block__source {
+  color: oklch(0.65 0.22 280);
+}
+
 /* Legacy chat-image kept for backward compat */
 .chat-image {
   width: 100%;

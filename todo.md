@@ -407,3 +407,12 @@
 - [x] Apply per-section AI image generation and placement with captions to Owner Chat
 - [x] Preserve Owner Chat metadata badges (knowledge used, confidence, timestamp)
 - [x] Run tests and save checkpoint
+
+## Quote Blocks in Responses (Apr 12 2026)
+
+- [x] Update IFA engine system prompt: Pillar 1 must include an Odu verse or Ifá quote block (ODU_QUOTE: ... / ODU_SOURCE: ...)
+- [x] Update IFA engine system prompt: Pillar 2 must include a scientific/quantum/environmental quote block (SCI_QUOTE: ... / SCI_SOURCE: ...)
+- [x] Parse ODU_QUOTE/SCI_QUOTE markers from response text on the frontend
+- [x] Render styled QuoteBlock component: left accent border, italic quote text, attribution line
+- [x] Apply to both Chat.tsx and OwnerChat.tsx
+- [x] Run tests and save checkpoint

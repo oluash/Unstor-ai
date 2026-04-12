@@ -12,6 +12,7 @@ import {
 import { Streamdown } from "streamdown";
 import { nanoid } from "nanoid";
 import { toast } from "sonner";
+import { QuoteBlock, parseQuotes } from "@/components/QuoteBlock";
 
 const UNSTOR_AVATAR = "https://d2xsxph8kpxj0f.cloudfront.net/310519663246644329/WtjdqCZuUAjS52crCAfDKK/unstor-avatar-o6axhgpSuTHquWi5bcWcYG.webp";
 
@@ -162,13 +163,25 @@ function AssistantMessage({
   const renderSections = () =>
     sections.map((section, sIdx) => {
       const img = message.sectionImages?.find((i) => i.sectionIndex === sIdx);
+      // Parse quote markers out of the body text
+      const { cleaned: cleanedBody, oduQuote, sciQuote } = parseQuotes(section.body);
+      const isPillar1 = sIdx === 0;
+      const isPillar2 = sIdx === 1;
       return (
         <div key={sIdx} className="pillar-section">
           {section.heading && (
             <Streamdown className="chat-prose">{section.heading}</Streamdown>
           )}
-          {section.body && (
-            <Streamdown className="chat-prose">{section.body}</Streamdown>
+          {cleanedBody && (
+            <Streamdown className="chat-prose">{cleanedBody}</Streamdown>
+          )}
+          {/* Odu verse quote — shown in Pillar 1 */}
+          {isPillar1 && oduQuote && (
+            <QuoteBlock quote={oduQuote.quote} source={oduQuote.source} type="odu" />
+          )}
+          {/* Scientific quote — shown in Pillar 2 */}
+          {isPillar2 && sciQuote && (
+            <QuoteBlock quote={sciQuote.quote} source={sciQuote.source} type="science" />
           )}
           {img?.url && (
             <div className="ai-image-block">
