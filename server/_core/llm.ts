@@ -265,7 +265,57 @@ const normalizeResponseFormat = ({
   };
 };
 
+// ─── DeepSeek routing ───────────────────────────────────────────────────────
+// When DEEPSEEK_API_KEY is set, route ALL LLM calls through DeepSeek instead
+// of the Manus forge API. DeepSeek is OpenAI-compatible so the response shape
+// is identical — no changes needed in callers.
+async function invokeDeepSeek(params: InvokeParams): Promise<InvokeResult> {
+  const apiKey = process.env.DEEPSEEK_API_KEY;
+  if (!apiKey) throw new Error("DEEPSEEK_API_KEY not set");
+
+  const { messages, maxTokens, max_tokens } = params;
+
+  // Flatten messages to simple {role, content} for DeepSeek
+  const normalizedMessages = messages.map(m => ({
+    role: m.role,
+    content: typeof m.content === "string"
+      ? m.content
+      : Array.isArray(m.content)
+        ? (m.content as Array<{type:string;text?:string}>)
+            .filter(p => p.type === "text")
+            .map(p => p.text ?? "")
+            .join("\n")
+        : "",
+  }));
+
+  const response = await fetch("https://api.deepseek.com/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model: "deepseek-chat",
+      messages: normalizedMessages,
+      max_tokens: maxTokens || max_tokens || 4096,
+      temperature: 0.7,
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`DeepSeek invoke failed: ${response.status} ${response.statusText} – ${errorText}`);
+  }
+
+  return (await response.json()) as InvokeResult;
+}
+
 export async function invokeLLM(params: InvokeParams): Promise<InvokeResult> {
+  // Route through DeepSeek if API key is available
+  if (process.env.DEEPSEEK_API_KEY) {
+    return invokeDeepSeek(params);
+  }
+
   assertApiKey();
 
   const {
