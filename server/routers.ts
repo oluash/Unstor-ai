@@ -138,12 +138,8 @@ export const appRouter = router({
           { role: "user" as const, content: input.message },
         ];
 
-        // Use built-in LLM if KIMI_API_KEY is not available
-        let kimiResponse: { content: string; tokenCount: number };
-        if (apiKey) {
-          kimiResponse = await kimiChat(kimiMessages, apiKey, knowledgeContext);
-        } else {
-          // Fall back to built-in Manus LLM with the same system prompt
+        // Use built-in LLM — always reliable fallback
+        const useLLMFallback = async () => {
           const { UNSTOR_SYSTEM_PROMPT } = await import("./kimi");
           const systemContent = knowledgeContext
             ? `${UNSTOR_SYSTEM_PROMPT}\n\n---\nYOUR CURRENT KNOWLEDGE BASE (use this to ground your response — cite relevant entries):\n${knowledgeContext}`
@@ -154,7 +150,20 @@ export const appRouter = router({
           ];
           const llmResponse = await invokeLLM({ messages: llmMessages });
           const content = llmResponse.choices[0]?.message?.content ?? "I am still learning. Please ask me again soon.";
-          kimiResponse = { content: typeof content === "string" ? content : JSON.stringify(content), tokenCount: 0 };
+          return { content: typeof content === "string" ? content : JSON.stringify(content), tokenCount: 0 };
+        };
+
+        let kimiResponse: { content: string; tokenCount: number };
+        if (apiKey) {
+          try {
+            kimiResponse = await kimiChat(kimiMessages, apiKey, knowledgeContext);
+          } catch (kimiErr: unknown) {
+            // Kimi API failed (invalid key, quota, network) — fall back to built-in LLM
+            console.warn("[Unstor] Kimi API error, falling back to built-in LLM:", kimiErr instanceof Error ? kimiErr.message : kimiErr);
+            kimiResponse = await useLLMFallback();
+          }
+        } else {
+          kimiResponse = await useLLMFallback();
         }
 
         const assistantPromptId = await insertPrompt({
