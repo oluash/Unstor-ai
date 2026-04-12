@@ -337,62 +337,65 @@ export async function groundedOwnerChat(
     knowledge.epigeneticsResults.length +
     knowledge.researchResults.length;
 
-  // Build knowledge context
+  // Build knowledge context — Odù FIRST (Pillar 1), Science SECOND (Pillar 2), Physical/Nature THIRD (Pillar 3)
   let knowledgeContext = "";
 
-  if (knowledge.nodes.length > 0) {
-    knowledgeContext += "\n## Knowledge Nodes I Have Learned:\n";
-    knowledge.nodes.forEach(n => {
-      knowledgeContext += `- **${n.topic}**: ${n.summary ?? ""} (confidence: ${((n.confidenceScore ?? 0) * 100).toFixed(0)}%)\n`;
-    });
-  }
-
-  if (knowledge.feeds.length > 0) {
-    knowledgeContext += "\n## Sources I Have Studied:\n";
-    knowledge.feeds.forEach(f => {
-      knowledgeContext += `- **${f.title ?? "Untitled"}**: ${f.processedContent ?? ""}\n`;
-    });
-  }
-
+  // PILLAR 1 — Ifá Odù (always first so the model grounds in Ifá before anything else)
   if (knowledge.ifaOduResults.length > 0) {
-    knowledgeContext += "\n## Relevant Ifá Odù:\n";
+    knowledgeContext += "\n## PILLAR 1 — IFÁ ODÙ REFERENCES (ground your response in these Odù):\n";
     knowledge.ifaOduResults.forEach(o => {
-      knowledgeContext += `- **${o.primaryName}** (#${o.oduNumber}): ${o.summary ?? ""}\n`;
-      if (o.lifeApplications) knowledgeContext += `  Applications: ${o.lifeApplications}\n`;
+      knowledgeContext += `- **${o.primaryName}** (Odù #${o.oduNumber}): ${o.summary ?? ""}\n`;
+      if (o.lifeApplications) knowledgeContext += `  Life Applications: ${o.lifeApplications}\n`;
+      if (o.taboos) knowledgeContext += `  Taboos: ${o.taboos}\n`;
     });
   }
 
-  if (knowledge.medicineResults.length > 0) {
-    knowledgeContext += "\n## Herbal Medicine Knowledge:\n";
-    knowledge.medicineResults.forEach(m => {
-      knowledgeContext += `- **${m.herbName}** (${m.tradition}): ${m.uses ?? ""}\n`;
-    });
-  }
+  // PILLAR 2 — Science: quantum physics, psychology, epigenetics, research papers
   if (knowledge.quantumResults.length > 0) {
-    knowledgeContext += "\n## Quantum Physics Knowledge:\n";
+    knowledgeContext += "\n## PILLAR 2 — QUANTUM PHYSICS & SCIENCE (use for scientific backing):\n";
     knowledge.quantumResults.forEach(q => {
       knowledgeContext += `- **${q.topic}** (${q.subtopic ?? ""}): ${q.plainLanguageSummary ?? q.content?.slice(0, 300) ?? ""}\n`;
       if (q.ifaBridge) knowledgeContext += `  Ifá Bridge: ${q.ifaBridge}\n`;
     });
   }
   if (knowledge.psychologyResults.length > 0) {
-    knowledgeContext += "\n## Psychology & Behavioural Science:\n";
+    knowledgeContext += "\n## PILLAR 2 — PSYCHOLOGY & BEHAVIOURAL SCIENCE (use for scientific backing):\n";
     knowledge.psychologyResults.forEach(p => {
       knowledgeContext += `- **${p.framework}** — ${p.technique ?? ""}: ${p.content?.slice(0, 300) ?? ""}\n`;
       if (p.practicalApplication) knowledgeContext += `  Practice: ${p.practicalApplication?.slice(0, 200)}\n`;
     });
   }
   if (knowledge.epigeneticsResults.length > 0) {
-    knowledgeContext += "\n## Epigenetics & Systems Biology:\n";
+    knowledgeContext += "\n## PILLAR 2 — EPIGENETICS & SYSTEMS BIOLOGY (use for scientific backing):\n";
     knowledge.epigeneticsResults.forEach(e => {
       knowledgeContext += `- **${e.mechanism}** (${e.genePathway ?? ""}): ${e.plainLanguageSummary ?? e.content?.slice(0, 300) ?? ""}\n`;
       if (e.ancestralConnection) knowledgeContext += `  Ancestral Connection: ${e.ancestralConnection?.slice(0, 200)}\n`;
     });
   }
   if (knowledge.researchResults.length > 0) {
-    knowledgeContext += "\n## Recent Research Papers:\n";
+    knowledgeContext += "\n## PILLAR 2 — RESEARCH PAPERS (cite these for scientific backing):\n";
     knowledge.researchResults.forEach(r => {
       knowledgeContext += `- **${r.title}** (${r.source ?? ""}, ${r.publishedDate ? new Date(r.publishedDate).getFullYear() : ""}): ${r.abstract?.slice(0, 250) ?? ""}\n`;
+    });
+  }
+
+  // PILLAR 3 — Physical/real-world: herbal medicine, knowledge nodes, sacred texts
+  if (knowledge.medicineResults.length > 0) {
+    knowledgeContext += "\n## PILLAR 3 — HERBAL MEDICINE & PHYSICAL WORLD (use for real-world examples):\n";
+    knowledge.medicineResults.forEach(m => {
+      knowledgeContext += `- **${m.herbName}** (${m.tradition}): ${m.uses ?? ""}\n`;
+    });
+  }
+  if (knowledge.nodes.length > 0) {
+    knowledgeContext += "\n## PILLAR 3 — KNOWLEDGE NODES (use for real-world grounding):\n";
+    knowledge.nodes.forEach(n => {
+      knowledgeContext += `- **${n.topic}**: ${n.summary ?? ""} (confidence: ${((n.confidenceScore ?? 0) * 100).toFixed(0)}%)\n`;
+    });
+  }
+  if (knowledge.feeds.length > 0) {
+    knowledgeContext += "\n## PILLAR 3 — SACRED TEXTS & SOURCES (use for real-world grounding):\n";
+    knowledge.feeds.forEach(f => {
+      knowledgeContext += `- **${f.title ?? "Untitled"}**: ${(f.processedContent ?? "").slice(0, 300)}\n`;
     });
   }
 
@@ -445,11 +448,36 @@ HOLISTIC GUIDANCE (address all relevant dimensions in every response):
 4. Relational — relationships, community, ancestors, how others are involved
 5. Energetic/Quantum — vibration, intention, what energy is being emitted and attracted, what shift is available
 
-RESPONSE STRUCTURE (follow this expanded format for guidance responses):
-1. Odù / Principle — name it, then decode it in layers (etymology, literal, symbolic)
-2. The Message — what this Odù says to this person right now, in plain language
-3. Layered Insight — holistic breakdown across spiritual, physical, mental/emotional, relational, energetic dimensions
-4. Action — holistic practical steps: spiritual action, physical action, mental/emotional action, relational action, energetic action
+MANDATORY RESPONSE STRUCTURE — THREE PILLARS (required in every response, no exceptions):
+
+**PILLAR 1 — ODÙ REFERENCE (Ifá Grounding)**
+- Name the specific Odù that speaks to this situation
+- Etymology: break down the name word by word in Yoruba with plain English meanings
+- Literal meaning: full translation of the name
+- Symbolic meaning: what archetype or energy this Odù embodies
+- The Ese (verse): paraphrase the relevant verse in plain language
+- Personal application: apply directly to this person's situation
+- If the question is not spiritual, STILL find the most relevant Odù — every human situation has one
+
+**PILLAR 2 — SCIENTIFIC BACKING (Evidence Grounding)**
+- Cite a specific scientific field, study, mechanism, or principle that supports the insight
+- Use: "Research in [field] shows...", "A study in [journal] found...", "The science of [mechanism] explains..."
+- Health: cite the physiological/neurological mechanism (cortisol, neuroplasticity, gut-brain axis, epigenetics)
+- Psychology: cite attachment theory, polyvagal, dopamine, mirror neurons, CBT evidence
+- Spiritual/metaphysical: cite consciousness studies, quantum biology, systems theory as analogy
+- This pillar is NOT optional — it is required in every response
+
+**PILLAR 3 — REAL-WORLD PHYSICAL EXAMPLE (Reality Grounding)**
+- Give a concrete, observable example from nature, the human body, physics, or everyday life
+- The example must be something the person can SEE, OBSERVE, or EXPERIENCE directly
+- Strong examples: a mango tree selecting which blossoms to bring to fruit; a wound healing in precise sequence; a river carving new channels through persistent flow; a seed that cannot grow in compacted soil
+- End by connecting the physical example back to this person's specific situation
+
+After the three pillars, provide:
+- Layered Insight: spiritual, mental/emotional, physical/environmental, relational, energetic dimensions
+- Action: spiritual action, physical action, mental/emotional action, relational action, energetic action
+
+NEVER: treatment plans, prescriptions, dosages. Actions are behavioural, lifestyle, reflective, spiritual, or energetic.
 
 ${knowledgeContext ? `YOUR CURRENT KNOWLEDGE BASE:\n${knowledgeContext}` : "[Your knowledge base is still growing. Be honest about what you know and don't know yet.]"}`;
 

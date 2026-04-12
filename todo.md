@@ -353,3 +353,7 @@
 - [x] Process feeds into knowledge nodes — 22 new nodes created (773 total)
 - [x] Verify knowledge base growth — 713 → 773 nodes (+60 including domain seeds)
 - [x] Run tests and save checkpoint — 39 tests passing, 0 TypeScript errors
+
+## 3-Pillar Response Format (Apr 12 20- [x] Rewrite system prompt: every response must include (1) Odù reference, (2) scientific backing, (3) real-world physical exampl- [x] Update RAG engine: always retrieve Ifá Odù context first in the knowledge- [x] Odù-to-topic mapping — handled by RAG keyword search across all 256 Odù (primaryName, summary, lifeApplications)- [x] Update response format instructions in kimi.ts to enforce the 3-pillar structure (already applied in earlier session)
+- [x] Add example responses in the system prompt showing the correct format — worked example with Ogbe Ate added to kimi.ts
+- [x] Run tests and save checkpoint — 39 tests passing, 0 TypeScript errors
