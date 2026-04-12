@@ -16,7 +16,9 @@ import {
   saveOwnerQuery,
   getSystemStats,
   getRecentSessions,
+  getUserByEmail,
 } from "./db";
+import bcrypt from "bcryptjs";
 import { kimiChat } from "./kimi";
 import { invokeLLM } from "./_core/llm";
 import { generateImage } from "./_core/imageGeneration";
@@ -48,6 +50,62 @@ export const appRouter = router({
 
   auth: router({
     me: publicProcedure.query((opts) => opts.ctx.user),
+
+    register: publicProcedure
+      .input(z.object({
+        name: z.string().min(2).max(128),
+        email: z.string().email(),
+        password: z.string().min(8).max(128),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const existing = await getUserByEmail(input.email.toLowerCase());
+        if (existing) {
+          throw new TRPCError({ code: "CONFLICT", message: "An account with this email already exists." });
+        }
+        const passwordHash = await bcrypt.hash(input.password, 12);
+        const openId = `email_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+        const { upsertUser, getUserByOpenId } = await import("./db");
+        await upsertUser({
+          openId,
+          name: input.name,
+          email: input.email.toLowerCase(),
+          loginMethod: "email",
+          passwordHash,
+          emailVerified: false,
+          lastSignedIn: new Date(),
+        } as any);
+        const user = await getUserByOpenId(openId);
+        if (!user) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Failed to create account." });
+        const { sdk } = await import("./_core/sdk");
+        const token = await sdk.signSession({ openId, appId: "unstor", name: input.name });
+        const cookieOptions = getSessionCookieOptions(ctx.req);
+        ctx.res.cookie(COOKIE_NAME, token, cookieOptions);
+        return { success: true, user: { id: user.id, name: user.name, email: user.email, role: user.role } };
+      }),
+
+    login: publicProcedure
+      .input(z.object({
+        email: z.string().email(),
+        password: z.string().min(1),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const user = await getUserByEmail(input.email.toLowerCase());
+        if (!user || !user.passwordHash) {
+          throw new TRPCError({ code: "UNAUTHORIZED", message: "Invalid email or password." });
+        }
+        const valid = await bcrypt.compare(input.password, user.passwordHash);
+        if (!valid) {
+          throw new TRPCError({ code: "UNAUTHORIZED", message: "Invalid email or password." });
+        }
+        const { upsertUser } = await import("./db");
+        await upsertUser({ openId: user.openId, lastSignedIn: new Date() });
+        const { sdk } = await import("./_core/sdk");
+        const token = await sdk.signSession({ openId: user.openId, appId: "unstor", name: user.name ?? "" });
+        const cookieOptions = getSessionCookieOptions(ctx.req);
+        ctx.res.cookie(COOKIE_NAME, token, cookieOptions);
+        return { success: true, user: { id: user.id, name: user.name, email: user.email, role: user.role } };
+      }),
+
     logout: publicProcedure.mutation(({ ctx }) => {
       const cookieOptions = getSessionCookieOptions(ctx.req);
       ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });

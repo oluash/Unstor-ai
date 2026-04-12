@@ -459,3 +459,21 @@
 - [x] Add prominent "View full Odù reference →" link button on the ODU QuoteBlock (in addition to the source attribution link)
 - [x] Add same Copy + TTS buttons to the Ese verse block on the IFA reference page
 - [x] Test and save checkpoint
+
+## Bug: Cannot Access Account / Login Fails (Apr 12 2026)
+
+- [ ] Diagnose OAuth/login error from server logs
+- [ ] Fix the login flow so users can access their accounts
+- [ ] Test and save checkpoint
+
+## Standalone Auth — Google + Email/Password (Apr 12 2026)
+
+- [x] Add passwordHash column to users table; run migration
+- [x] Add auth.register procedure (email + password, bcrypt hash)
+- [x] Add auth.login procedure (email + password, verify hash, issue JWT cookie)
+- [x] Add Google OAuth server-side flow — skipped, user chose email/password only
+- [x] Build /login page: email/password register/login toggle form with Manus OAuth as secondary option
+- [x] Keep Manus OAuth as optional secondary login method
+- [x] Protect routes: redirect unauthenticated users to /login (getLoginUrl now points to /login)
+- [x] Update useAuth hook — no change needed, existing JWT cookie mechanism works for both auth paths
+- [x] Test all auth flows and save checkpoint

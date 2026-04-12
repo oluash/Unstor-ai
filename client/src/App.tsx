@@ -18,11 +18,13 @@ import PromptLibrary from "./pages/PromptLibrary";
 import Research from "./pages/Research";
 import Activation from "./pages/Activation";
 import IFAReference from "./pages/IFAReference";
+import Login from "./pages/Login";
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
+      <Route path="/login" component={Login} />
       <Route path="/chat" component={Chat} />
       <Route path="/admin" component={Admin} />
       <Route path="/knowledge" component={KnowledgeExplorer} />
