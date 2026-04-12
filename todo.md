@@ -375,3 +375,14 @@
 - [x] Reduce PILLAR heading sizes — h1/h2 → 16px bold, h3/h4 → 15px semibold via .chat-prose CSS rules
 - [x] Reduce bullet list indentation — padding-left: 1.25rem in .chat-prose ul/ol
 - [x] Run tests and save checkpoint — 39 tests passing, 0 TypeScript errors
+
+## Chat Width + Image Placement Fix (Apr 12 2026)
+
+- [x] Remove max-w-2xl constraint from messages container so responses fill full screen width
+- [x] Remove max-w-[86%] from assistant bubble — assistant messages now use flex-1 (full width)
+- [x] Split response into PILLAR sections and generate one image per pillar section
+- [x] Images placed after each pillar section (after Pillar 1, Pillar 2, Pillar 3) not just at top
+- [x] Image generation runs in parallel for all 3 pillars, resolves progressively
+- [x] Domain-aware image prompts: Pillar 1 → ifa_studies, Pillar 2 → quantum_physics, Pillar 3 → nature
+- [x] User messages remain compact right-aligned bubbles (max-w-[82%])
+- [x] Run tests and save checkpoint — 39 tests passing, 0 TypeScript errors
