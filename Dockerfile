@@ -17,7 +17,7 @@ FROM node:22-alpine AS runner
 WORKDIR /app
 RUN npm install -g pnpm
 
-# Copy only what's needed to run
+# Copy built artifacts (dist includes both server JS and dist/public frontend)
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
